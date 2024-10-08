@@ -1,4 +1,4 @@
-package com.example.usmhub_app
+package com.usmhub.app
 
 import io.flutter.embedding.android.FlutterActivity
 

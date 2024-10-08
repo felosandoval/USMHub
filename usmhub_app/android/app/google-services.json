@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "915279761372",
+    "project_id": "usmhub",
+    "storage_bucket": "usmhub.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:915279761372:android:3c0cc1b54a0f20a5c5c919",
+        "android_client_info": {
+          "package_name": "com.usmhub.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDJnTysyyfpjdmXAndTNyJgxPn9Hm0mgTE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
