@@ -4,8 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:dropdown_search/dropdown_search.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+//import 'package:dropdown_search/dropdown_search.dart';
+//import 'package:firebase_messaging/firebase_messaging.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // PENDIENTE: Inicializar los widgets
@@ -68,7 +68,6 @@ class _HomePageState extends State<HomePage> {
               'USM Hub',
               style: 
                 GoogleFonts.roboto(
-                  color: Colors.white,
                   fontSize: 25
                 ),
             ),
@@ -83,7 +82,7 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Column(
         children: [
-          // Buscador en tiempo real
+          // Buscador en tiempo real con margen lateral
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
             child: TextField(
@@ -104,25 +103,36 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           Expanded(
-            child: GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-              ),
-              itemCount: filteredSites.length,
-              itemBuilder: (context, index) {
-                return Card(
-                  child: InkWell(
-                    onTap: () => _launchURL(filteredSites[index].url),
-                    child: Center(
-                      child: Text(filteredSites[index].name),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),  // Margen solo a los lados
+              child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 10.0,  // Espacio horizontal entre las cards
+                  mainAxisSpacing: 10.0,  // Espacio vertical entre las cards
+                ),
+                itemCount: filteredSites.length,
+                itemBuilder: (context, index) {
+                  return Card(
+                    color: Colors.green.shade100,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15.0),  // Bordes redondeados
                     ),
-                  ),
-                );
-              },
+                    child: InkWell(
+                      onTap: () => _launchURL(filteredSites[index].url),
+                      child: Center(
+                        child: Text(filteredSites[index].name),
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
           ),
         ],
       )
+
+
     );
   }
 
