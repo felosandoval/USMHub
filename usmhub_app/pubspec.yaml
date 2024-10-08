@@ -10,6 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   google_fonts: ^6.2.1
+  flutter_rating_bar: ^4.0.1
 
   # Firebase Messaging para notificaciones push
   firebase_messaging: ^15.1.3

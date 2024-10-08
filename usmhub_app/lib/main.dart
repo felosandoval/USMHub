@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        useMaterial3: false,
+        useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.blue, // Color base para generar la paleta
         ),
@@ -37,18 +37,126 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
+class Subsystem {
+  final int id;
+  final String name;
+  final String url;
+  final String details;
+  final List<String> procedures; // Nuevo campo para trámites
+
+  Subsystem({required this.id, required this.name, required this.url, required this.details, required this.procedures});
+}
+
 class _HomePageState extends State<HomePage> {
   List<Subsystem> allSites = [
-    Subsystem(name: 'Siga', url: 'https://siga.usm.cl'),
-    Subsystem(name: 'Aula', url: 'https://aula.usm.cl'),
-    Subsystem(name: 'Autoservicio', url: 'https://autoservicio.usm.cl'),
-    Subsystem(name: 'Sireb', url: 'https://sireb.usm.cl/'),
-    Subsystem(name: 'Casino', url: 'https://casino.usm.cl/'),
-    Subsystem(name: 'GitLab DINF', url: 'https://gitlab.inf.utfsm.cl/'),
-    Subsystem(name: 'GitLab LabComp', url: 'https://gitlab.labcomp.cl/'),
-    Subsystem(name: 'Asuntos Internacionales', url: 'https://oai.usm.cl/'),
+    Subsystem(
+      id: 1,
+      name: 'Siga',
+      url: 'https://siga.usm.cl',
+      details: 'Sistema de información y gestión académica.',
+      procedures: [
+        'Revisar horario',
+        'Inscribir ramos',
+        'Generar certificados de alumno regular',
+        'Ver resumen académico',
+      ],
+    ),
     
-    //Subsystem(name: '', url: ''),
+    Subsystem(
+      id: 2,
+      name: 'Aula',
+      url: 'https://aula.usm.cl',
+      details: 'Accede a materiales de curso, foros y tareas.',
+      procedures: [
+        'Participar en foros',
+        'Entregar tareas',
+        'Ver calificaciones',
+      ],
+    ),
+    
+    Subsystem(
+      id: 3,
+      name: 'Autoservicio',
+      url: 'https://autoservicio.usm.cl',
+      details: 'Accede a materiales de curso, foros y tareas.',
+      procedures: [
+        'Participar en foros',
+        'Entregar tareas',
+        'Ver calificaciones',
+      ],
+    ),
+
+    Subsystem(
+      id: 4,
+      name: 'Sireb',
+      url: 'https://sireb.usm.cl',
+      details: 'A.',
+      procedures: [
+        'A',
+        'A',
+        'A',
+      ],
+    ),
+
+    Subsystem(
+      id: 5,
+      name: 'Casino',
+      url: 'https://casino.usm.cl',
+      details: 'A.',
+      procedures: [
+        'A',
+        'A',
+        'A',
+      ],
+    ),
+
+    Subsystem(
+      id: 6,
+      name: 'GitLab DINF',
+      url: 'https://gitlab.inf.utfsm.cl/',
+      details: 'A.',
+      procedures: [
+        'A',
+        'A',
+        'A',
+      ],
+    ),
+
+    Subsystem(
+      id: 7,
+      name: 'GitLab LabComp',
+      url: 'https://gitlab.labcomp.cl/',
+      details: 'A.',
+      procedures: [
+        'A',
+        'A',
+        'A',
+      ],
+    ),
+
+    Subsystem(
+      id: 8,
+      name: 'Asuntos Internacionales',
+      url: 'https://oai.usm.cl/',
+      details: 'A.',
+      procedures: [
+        'A',
+        'A',
+        'A',
+      ],
+    ),
+
+    // Subsystem(
+    //   id: ,
+    //   name: 'A',
+    //   url: '',
+    //   details: 'A.',
+    //   procedures: [
+    //     'A',
+    //     'A',
+    //     'A',
+    //   ],
+    // ),
   ];
 
   List<Subsystem> filteredSites = [];
@@ -119,13 +227,20 @@ class _HomePageState extends State<HomePage> {
                       borderRadius: BorderRadius.circular(15.0),  // Bordes redondeados
                     ),
                     child: InkWell(
-                      onTap: () => _launchURL(filteredSites[index].url),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => SiteDetailPage(site: filteredSites[index]),
+                          ),
+                        );
+                      },
                       child: Center(
                         child: Text(filteredSites[index].name),
                       ),
                     ),
                   );
-                },
+                }
               ),
             ),
           ),
@@ -207,9 +322,64 @@ class _UniversityCalendarState extends State<UniversityCalendar> {
   }
 }
 
-class Subsystem {
-  final String name;
-  final String url;
+class SiteDetailPage extends StatelessWidget {
+  final Subsystem site;
 
-  Subsystem({required this.name, required this.url});
+  SiteDetailPage({required this.site});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("Información del sitio")),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              site.name,
+              style: GoogleFonts.roboto(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 10),
+            Text(
+              site.details,
+              style: GoogleFonts.roboto(
+                fontSize: 18,
+              ),
+            ),
+            SizedBox(height: 20),
+            Text(
+              'Trámites disponibles:',
+              style: GoogleFonts.roboto(
+                fontSize: 26,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 13),
+            ...site.procedures.map((procedure) => Text(
+              '• $procedure',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.normal),
+            )).toList(),
+
+            SizedBox(height: 40),
+            Center(
+              child: ElevatedButton(
+                onPressed: () => _launchURL(site.url),
+                child: Text('IR AL SITIO'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _launchURL(String url) async {
+    if (!await launchUrl(Uri.parse(url))) {
+      throw Exception('No se puede cargar la url: $url');
+    }
+  }
 }
