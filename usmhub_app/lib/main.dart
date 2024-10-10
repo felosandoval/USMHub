@@ -34,13 +34,12 @@ Future<User?> signInWithGoogle() async {
   return userCredential.user;
 }
 
-
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        useMaterial3: true,
+        useMaterial3: false,
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.blue, // Color base para generar la paleta
         ),
@@ -368,20 +367,48 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
   }
 
   void _checkUserRating() async {
-    final doc = await FirebaseFirestore.instance
-        .collection('ratings')
-        .doc(widget.site.id.toString())
-        .collection('userRatings')
-        .doc(user!.uid)
-        .get();
+    final User? user = FirebaseAuth.instance.currentUser;
 
-    if (doc.exists) {
-      setState(() {
-        _userRating = doc['rating'];
-      });
+    if (user != null) {
+      try {
+        final doc = await _retryOnException(() async {
+          return await FirebaseFirestore.instance
+            .collection('ratings')
+            .doc(widget.site.id.toString())
+            .collection('userRatings')
+            .doc(user.uid)
+            .get();
+        });
+
+        if (doc.exists) {
+          setState(() {
+            _userRating = doc['rating'];
+          });
+        }
+
+        _calculateAverageRating();
+      } catch (e) {
+        // Manejar el error aquí
+        print('Error al obtener el rating del usuario: $e');
+      }
+    } else {
+      // Maneja el caso donde el usuario no ha iniciado sesión
+      print('El usuario no ha iniciado sesión.');
     }
+  }
 
-    _calculateAverageRating();
+  Future<T> _retryOnException<T>(Future<T> Function() action, {int retries = 5}) async {
+    for (int attempt = 0; attempt < retries; attempt++) {
+      try {
+        return await action();
+      } catch (e) {
+        if (attempt == retries - 1) {
+          rethrow;
+        }
+        await Future.delayed(Duration(seconds: 2 * (attempt + 1))); // Backoff exponencial
+      }
+    }
+    throw Exception('Failed after $retries attempts');
   }
 
   void _calculateAverageRating() async {
@@ -393,9 +420,11 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
 
     if (snapshot.docs.isNotEmpty) {
       final totalRatings = snapshot.docs.map((doc) => doc['rating'] as double).reduce((a, b) => a + b);
-      setState(() {
-        _averageRating = totalRatings / snapshot.docs.length;
-      });
+      if (mounted) {
+        setState(() {
+          _averageRating = totalRatings / snapshot.docs.length;
+        });
+      }
     }
   }
 

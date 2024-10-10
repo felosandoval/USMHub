@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "915279761372-shm0a4l9kk5vpopl25ialq4ecbtlphpm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.usmhub.app",
+            "certificate_hash": "8ee50ea79e277ecdee6071dc7c6806bfb52393dc"
+          }
+        },
+        {
           "client_id": "915279761372-u1du85uiievjkat26ualtd8rouomggep.apps.googleusercontent.com",
           "client_type": 3
         }
