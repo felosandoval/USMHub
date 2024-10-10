@@ -21,9 +21,16 @@ void main() async {
   runApp(MyApp());
 }
 
-Future<User?> signInWithGoogle() async {
+Future<User?> signInWithGoogle(BuildContext context) async {
   final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-  final GoogleSignInAuthentication googleAuth = await googleUser!.authentication;
+
+  if (googleUser == null) {
+    // El usuario no seleccionó ninguna cuenta
+    _showMessage(context, 'Por favor, para calificar, seleccione su cuenta');
+    return null; // Retorna null para indicar que no se seleccionó ninguna cuenta
+  }
+
+  final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
 
   final AuthCredential credential = GoogleAuthProvider.credential(
     accessToken: googleAuth.accessToken,
@@ -32,6 +39,14 @@ Future<User?> signInWithGoogle() async {
 
   UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
   return userCredential.user;
+}
+
+void _showMessage(BuildContext context, String message) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(message),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -415,6 +430,7 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
     }
   }
 
+
   void _submitRating(double rating) async {
     await FirebaseFirestore.instance
         .collection('ratings')
@@ -506,7 +522,7 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
             ] else ...[
               ElevatedButton(
                 onPressed: () async {
-                  await signInWithGoogle();
+                  await signInWithGoogle(context);
                   _checkUserRating();
                 },
                 child: Text('Inicia sesión con Google para calificar'),
