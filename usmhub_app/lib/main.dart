@@ -21,13 +21,12 @@ void main() async {
   runApp(MyApp());
 }
 
-Future<User?> signInWithGoogle(BuildContext context) async {
+Future<User?> signInWithGoogle(BuildContext context, Function callback) async {
   final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
   if (googleUser == null) {
-    // El usuario no seleccionó ninguna cuenta
     _showMessage(context, 'Por favor, para calificar, seleccione su cuenta');
-    return null; // Retorna null para indicar que no se seleccionó ninguna cuenta
+    return null;
   }
 
   final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
@@ -38,6 +37,10 @@ Future<User?> signInWithGoogle(BuildContext context) async {
   );
 
   UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+  
+  // Llama al callback para actualizar el estado
+  callback();
+
   return userCredential.user;
 }
 
@@ -93,6 +96,7 @@ class _HomePageState extends State<HomePage> {
         'Inscribir ramos',
         'Generar certificados de alumno regular',
         'Ver resumen académico',
+        'Ver planes de carrera',
       ],
       ratings: [],
     ),
@@ -179,6 +183,19 @@ class _HomePageState extends State<HomePage> {
     Subsystem(
       id: 8,
       name: 'Asuntos Internacionales',
+      url: 'https://oai.usm.cl/',
+      details: 'A.',
+      procedures: [
+        'A',
+        'A',
+        'A',
+      ],
+      ratings: [],
+    ),
+
+    Subsystem(
+      id: 9,
+      name: 'Ass Ins',
       url: 'https://oai.usm.cl/',
       details: 'A.',
       procedures: [
@@ -363,9 +380,14 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
   @override
   void initState() {
     super.initState();
-    if (user != null) {
-      _checkUserRating();
-    }
+    _checkUserRating();
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (user != null) {
+        setState(() {
+          _checkUserRating();
+        });
+      }
+    });
   }
 
   void _checkUserRating() async {
@@ -430,20 +452,28 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
     }
   }
 
-
   void _submitRating(double rating) async {
-    await FirebaseFirestore.instance
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser != null) {
+      await FirebaseFirestore.instance
         .collection('ratings')
         .doc(widget.site.id.toString())
         .collection('userRatings')
-        .doc(user!.uid)
+        .doc(currentUser.uid)
         .set({'rating': rating});
 
-    _calculateAverageRating();
+      _calculateAverageRating();
+    } else {
+      // Maneja el caso donde el usuario no está autenticado
+      print('El usuario no ha iniciado sesión.');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -500,6 +530,7 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
             ),
             SizedBox(height: 10),
             if (user != null) ...[
+              // RESEÑAS (5 ESTRELLAS)
               Center(
                 child: RatingBar.builder(
                   initialRating: _userRating ?? 0.0,
@@ -510,7 +541,7 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
                   itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
                   itemBuilder: (context, _) => Icon(
                     Icons.star,
-                    color: Colors.yellow.shade600,
+                    color: Colors.amber,
                   ),
                   onRatingUpdate: (rating) {
                     setState(() {
@@ -522,12 +553,14 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
               ),
               SizedBox(height: 20),
             ] else ...[
-              // BOTON INICIAR SESION
               Center(
                 child: ElevatedButton(
                   onPressed: () async {
-                    await signInWithGoogle(context);
-                    _checkUserRating();
+                    await signInWithGoogle(context, () {
+                      setState(() {
+                        _checkUserRating();
+                      });
+                    });
                   },
                   child: Text('Inicia sesión con Google para calificar'),
                 ),
