@@ -5,6 +5,10 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 //import 'package:dropdown_search/dropdown_search.dart';
 //import 'package:firebase_messaging/firebase_messaging.dart';
 
@@ -16,6 +20,20 @@ void main() async {
 
   runApp(MyApp());
 }
+
+Future<User?> signInWithGoogle() async {
+  final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+  final GoogleSignInAuthentication googleAuth = await googleUser!.authentication;
+
+  final AuthCredential credential = GoogleAuthProvider.credential(
+    accessToken: googleAuth.accessToken,
+    idToken: googleAuth.idToken,
+  );
+
+  UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+  return userCredential.user;
+}
+
 
 class MyApp extends StatelessWidget {
   @override
@@ -261,12 +279,6 @@ class _HomePageState extends State<HomePage> {
 
     );
   }
-
-  void _launchURL(String url) async {
-    if (!await launchUrl(Uri.parse(url))) {
-      throw Exception('No se puede cargar la url: $url');
-    }
-  }
 }
 
 class UniversityCalendar extends StatefulWidget {
@@ -344,30 +356,72 @@ class SiteDetailPage extends StatefulWidget {
 
 class _SiteDetailPageState extends State<SiteDetailPage> {
   double? _userRating;
+  double _averageRating = 0.0;
+  final user = FirebaseAuth.instance.currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    if (user != null) {
+      _checkUserRating();
+    }
+  }
+
+  void _checkUserRating() async {
+    final doc = await FirebaseFirestore.instance
+        .collection('ratings')
+        .doc(widget.site.id.toString())
+        .collection('userRatings')
+        .doc(user!.uid)
+        .get();
+
+    if (doc.exists) {
+      setState(() {
+        _userRating = doc['rating'];
+      });
+    }
+
+    _calculateAverageRating();
+  }
+
+  void _calculateAverageRating() async {
+    final snapshot = await FirebaseFirestore.instance
+        .collection('ratings')
+        .doc(widget.site.id.toString())
+        .collection('userRatings')
+        .get();
+
+    if (snapshot.docs.isNotEmpty) {
+      final totalRatings = snapshot.docs.map((doc) => doc['rating'] as double).reduce((a, b) => a + b);
+      setState(() {
+        _averageRating = totalRatings / snapshot.docs.length;
+      });
+    }
+  }
+
+  void _submitRating(double rating) async {
+    await FirebaseFirestore.instance
+        .collection('ratings')
+        .doc(widget.site.id.toString())
+        .collection('userRatings')
+        .doc(user!.uid)
+        .set({'rating': rating});
+
+    _calculateAverageRating();
+  }
 
   @override
   Widget build(BuildContext context) {
-    double averageRating = widget.site.ratings.isNotEmpty
-        ? widget.site.ratings.reduce((a, b) => a + b) / widget.site.ratings.length
-        : 0.0;
-
     return Scaffold(
       appBar: AppBar(
         title: Row(
           children: [
-            Expanded(
-              child: Text(
-                "Información del sitio",
-                style: TextStyle(fontSize: 16), // Ajusta el tamaño según lo necesites
-              ),
-            ),
-            if (averageRating > 0)
-              Padding(
-                padding: const EdgeInsets.only(right: 16.0), // Espacio al borde derecho
-                child: Text(
-                  averageRating.toStringAsFixed(1),
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
+            Text(widget.site.name),
+            SizedBox(width: 10),
+            if (_averageRating > 0)
+              Text(
+                _averageRating.toStringAsFixed(1),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
           ],
         ),
@@ -413,8 +467,8 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
               ),
             ),
             SizedBox(height: 10),
-            Center(
-              child: RatingBar.builder(
+            if (user != null) ...[
+              RatingBar.builder(
                 initialRating: _userRating ?? 0.0,
                 minRating: 1,
                 direction: Axis.horizontal,
@@ -428,13 +482,21 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
                 onRatingUpdate: (rating) {
                   setState(() {
                     _userRating = rating;
-                    widget.site.ratings.add(rating);
                   });
+                  _submitRating(rating);
                 },
               ),
-            ),
-
-            SizedBox(height: 20),
+              SizedBox(height: 20),
+            ] else ...[
+              ElevatedButton(
+                onPressed: () async {
+                  await signInWithGoogle();
+                  _checkUserRating();
+                },
+                child: Text('Inicia sesión con Google para calificar'),
+              ),
+              SizedBox(height: 20),
+            ],
             Center(
               child: ElevatedButton(
                 onPressed: () => _launchURL(widget.site.url),

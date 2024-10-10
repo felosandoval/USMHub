@@ -12,7 +12,12 @@
           "package_name": "com.usmhub.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "915279761372-u1du85uiievjkat26ualtd8rouomggep.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDJnTysyyfpjdmXAndTNyJgxPn9Hm0mgTE"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "915279761372-ksvppnihpe7n1qk6migur09eivdtjsvq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "915279761372-757nrf4qcc8nonui3t19qrnech2ln68n.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.usmhubApp"
+              }
+            }
+          ]
         }
       }
     }
