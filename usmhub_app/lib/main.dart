@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 //import 'package:dropdown_search/dropdown_search.dart';
 //import 'package:firebase_messaging/firebase_messaging.dart';
 
@@ -43,8 +44,9 @@ class Subsystem {
   final String url;
   final String details;
   final List<String> procedures; // Nuevo campo para trámites
+  final List<double> ratings; // Nuevo campo para calificaciones
 
-  Subsystem({required this.id, required this.name, required this.url, required this.details, required this.procedures});
+  Subsystem({required this.id, required this.name, required this.url, required this.details, required this.procedures, required this.ratings});
 }
 
 class _HomePageState extends State<HomePage> {
@@ -60,6 +62,7 @@ class _HomePageState extends State<HomePage> {
         'Generar certificados de alumno regular',
         'Ver resumen académico',
       ],
+      ratings: [],
     ),
     
     Subsystem(
@@ -72,6 +75,8 @@ class _HomePageState extends State<HomePage> {
         'Entregar tareas',
         'Ver calificaciones',
       ],
+      ratings: [],
+
     ),
     
     Subsystem(
@@ -84,6 +89,7 @@ class _HomePageState extends State<HomePage> {
         'Entregar tareas',
         'Ver calificaciones',
       ],
+      ratings: [],
     ),
 
     Subsystem(
@@ -96,6 +102,7 @@ class _HomePageState extends State<HomePage> {
         'A',
         'A',
       ],
+      ratings: [],
     ),
 
     Subsystem(
@@ -108,6 +115,7 @@ class _HomePageState extends State<HomePage> {
         'A',
         'A',
       ],
+      ratings: [],
     ),
 
     Subsystem(
@@ -120,6 +128,7 @@ class _HomePageState extends State<HomePage> {
         'A',
         'A',
       ],
+      ratings: [],
     ),
 
     Subsystem(
@@ -132,6 +141,7 @@ class _HomePageState extends State<HomePage> {
         'A',
         'A',
       ],
+      ratings: [],
     ),
 
     Subsystem(
@@ -144,6 +154,7 @@ class _HomePageState extends State<HomePage> {
         'A',
         'A',
       ],
+      ratings: [],
     ),
 
     // Subsystem(
@@ -322,30 +333,60 @@ class _UniversityCalendarState extends State<UniversityCalendar> {
   }
 }
 
-class SiteDetailPage extends StatelessWidget {
+class SiteDetailPage extends StatefulWidget {
   final Subsystem site;
 
   SiteDetailPage({required this.site});
 
   @override
+  _SiteDetailPageState createState() => _SiteDetailPageState();
+}
+
+class _SiteDetailPageState extends State<SiteDetailPage> {
+  double? _userRating;
+
+  @override
   Widget build(BuildContext context) {
+    double averageRating = widget.site.ratings.isNotEmpty
+        ? widget.site.ratings.reduce((a, b) => a + b) / widget.site.ratings.length
+        : 0.0;
+
     return Scaffold(
-      appBar: AppBar(title: Text("Información del sitio")),
+      appBar: AppBar(
+        title: Row(
+          children: [
+            Expanded(
+              child: Text(
+                "Información del sitio",
+                style: TextStyle(fontSize: 16), // Ajusta el tamaño según lo necesites
+              ),
+            ),
+            if (averageRating > 0)
+              Padding(
+                padding: const EdgeInsets.only(right: 16.0), // Espacio al borde derecho
+                child: Text(
+                  averageRating.toStringAsFixed(1),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+          ],
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              site.name,
+              widget.site.name,
               style: GoogleFonts.roboto(
-                fontSize: 28,
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
             SizedBox(height: 10),
             Text(
-              site.details,
+              widget.site.details,
               style: GoogleFonts.roboto(
                 fontSize: 18,
               ),
@@ -354,20 +395,49 @@ class SiteDetailPage extends StatelessWidget {
             Text(
               'Trámites disponibles:',
               style: GoogleFonts.roboto(
-                fontSize: 26,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 13),
-            ...site.procedures.map((procedure) => Text(
+            SizedBox(height: 10),
+            ...widget.site.procedures.map((procedure) => Text(
               '• $procedure',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.normal),
+              style: TextStyle(fontSize: 18),
             )).toList(),
+            SizedBox(height: 20),
+            Text(
+              'Calificar este sitio:',
+              style: GoogleFonts.roboto(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 10),
+            Center(
+              child: RatingBar.builder(
+                initialRating: _userRating ?? 0.0,
+                minRating: 1,
+                direction: Axis.horizontal,
+                allowHalfRating: true,
+                itemCount: 5,
+                itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                itemBuilder: (context, _) => Icon(
+                  Icons.star,
+                  color: Colors.amber,
+                ),
+                onRatingUpdate: (rating) {
+                  setState(() {
+                    _userRating = rating;
+                    widget.site.ratings.add(rating);
+                  });
+                },
+              ),
+            ),
 
-            SizedBox(height: 40),
+            SizedBox(height: 20),
             Center(
               child: ElevatedButton(
-                onPressed: () => _launchURL(site.url),
+                onPressed: () => _launchURL(widget.site.url),
                 child: Text('IR AL SITIO'),
               ),
             ),
