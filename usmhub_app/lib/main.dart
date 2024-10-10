@@ -50,11 +50,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class HomePage extends StatefulWidget {
-  @override
-  _HomePageState createState() => _HomePageState();
-}
-
 class Subsystem {
   final int id;
   final String name;
@@ -64,6 +59,11 @@ class Subsystem {
   final List<double> ratings; // Nuevo campo para calificaciones
 
   Subsystem({required this.id, required this.name, required this.url, required this.details, required this.procedures, required this.ratings});
+}
+
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
@@ -128,7 +128,7 @@ class _HomePageState extends State<HomePage> {
       url: 'https://casino.usm.cl',
       details: 'A.',
       procedures: [
-        'A',
+        'Ver alimentos',
         'A',
         'A',
       ],
@@ -173,18 +173,7 @@ class _HomePageState extends State<HomePage> {
       ],
       ratings: [],
     ),
-
-    // Subsystem(
-    //   id: ,
-    //   name: 'A',
-    //   url: '',
-    //   details: 'A.',
-    //   procedures: [
-    //     'A',
-    //     'A',
-    //     'A',
-    //   ],
-    // ),
+    // Más subsistemas aquí...
   ];
 
   List<Subsystem> filteredSites = [];
@@ -199,14 +188,10 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: 
-          Text(
-              'USM Hub',
-              style: 
-                GoogleFonts.roboto(
-                  fontSize: 25
-                ),
-            ),
+        title: Text(
+          'USM Hub',
+          style: GoogleFonts.roboto(fontSize: 25),
+        ),
         actions: [
           IconButton(
             icon: Icon(Icons.calendar_today),
@@ -224,9 +209,12 @@ class _HomePageState extends State<HomePage> {
             child: TextField(
               onChanged: (text) {
                 setState(() {
-                  filteredSites = allSites.where((site) =>
-                    site.name.toLowerCase().contains(text.toLowerCase())
-                  ).toList();
+                  filteredSites = allSites.where((site) {
+                    final lowerCaseQuery = text.toLowerCase();
+                    final matchesName = site.name.toLowerCase().contains(lowerCaseQuery);
+                    final matchesProcedures = site.procedures.any((procedure) => procedure.toLowerCase().contains(lowerCaseQuery));
+                    return matchesName || matchesProcedures;
+                  }).toList();
                 });
               },
               decoration: InputDecoration(
@@ -273,12 +261,11 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ],
-      )
-
-
+      ),
     );
   }
 }
+
 
 class UniversityCalendar extends StatefulWidget {
   @override
