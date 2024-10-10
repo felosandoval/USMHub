@@ -500,32 +500,37 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
             ),
             SizedBox(height: 10),
             if (user != null) ...[
-              RatingBar.builder(
-                initialRating: _userRating ?? 0.0,
-                minRating: 1,
-                direction: Axis.horizontal,
-                allowHalfRating: true,
-                itemCount: 5,
-                itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-                itemBuilder: (context, _) => Icon(
-                  Icons.star,
-                  color: Colors.amber,
+              Center(
+                child: RatingBar.builder(
+                  initialRating: _userRating ?? 0.0,
+                  minRating: 1,
+                  direction: Axis.horizontal,
+                  allowHalfRating: true,
+                  itemCount: 5,
+                  itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                  itemBuilder: (context, _) => Icon(
+                    Icons.star,
+                    color: Colors.yellow.shade600,
+                  ),
+                  onRatingUpdate: (rating) {
+                    setState(() {
+                      _userRating = rating;
+                    });
+                    _submitRating(rating);
+                  },
                 ),
-                onRatingUpdate: (rating) {
-                  setState(() {
-                    _userRating = rating;
-                  });
-                  _submitRating(rating);
-                },
               ),
               SizedBox(height: 20),
             ] else ...[
-              ElevatedButton(
-                onPressed: () async {
-                  await signInWithGoogle(context);
-                  _checkUserRating();
-                },
-                child: Text('Inicia sesión con Google para calificar'),
+              // BOTON INICIAR SESION
+              Center(
+                child: ElevatedButton(
+                  onPressed: () async {
+                    await signInWithGoogle(context);
+                    _checkUserRating();
+                  },
+                  child: Text('Inicia sesión con Google para calificar'),
+                ),
               ),
               SizedBox(height: 20),
             ],
