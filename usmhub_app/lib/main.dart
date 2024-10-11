@@ -44,6 +44,12 @@ Future<User?> signInWithGoogle(BuildContext context, Function callback) async {
   return userCredential.user;
 }
 
+Future<void> signOutWithGoogle() async {
+  await GoogleSignIn().signOut();
+  await FirebaseAuth.instance.signOut();
+}
+
+
 void _showMessage(BuildContext context, String message) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
@@ -298,7 +304,6 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-
 class UniversityCalendar extends StatefulWidget {
   @override
   _UniversityCalendarState createState() => _UniversityCalendarState();
@@ -551,7 +556,19 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
                   },
                 ),
               ),
+              
               SizedBox(height: 20),
+              
+              // Add logout button
+              Center(
+                child: ElevatedButton(
+                  onPressed: () async {
+                    await signOutWithGoogle();
+                    setState(() {});
+                  },
+                  child: Text('Cerrar sesión'),
+                ),
+              ),
             ] else ...[
               Center(
                 child: ElevatedButton(
