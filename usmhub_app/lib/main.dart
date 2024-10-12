@@ -383,16 +383,16 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
       try {
         final doc = await _retryOnException(() async {
           return await FirebaseFirestore.instance
-            .collection('ratings')
-            .doc(widget.site.id.toString())
+            .collection('reseñas')
+            .doc(widget.site.name)
             .collection('userRatings')
-            .doc(user.uid)
+            .doc(user.email)
             .get();
         });
 
         if (doc.exists) {
           setState(() {
-            _userRating = doc['rating'];
+            _userRating = doc['valoración'];
           });
         } else {
           setState(() {
@@ -425,13 +425,13 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
 
   void _calculateAverageRating() async {
     final snapshot = await FirebaseFirestore.instance
-        .collection('ratings')
-        .doc(widget.site.id.toString())
+        .collection('reseñas')
+        .doc(widget.site.name)
         .collection('userRatings')
         .get();
 
     if (snapshot.docs.isNotEmpty) {
-      final totalRatings = snapshot.docs.map((doc) => doc['rating'] as double).reduce((a, b) => a + b);
+      final totalRatings = snapshot.docs.map((doc) => doc['valoración'] as double).reduce((a, b) => a + b);
       if (mounted) {
         setState(() {
           _averageRating = totalRatings / snapshot.docs.length;
@@ -445,11 +445,11 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
 
     if (currentUser != null) {
       await FirebaseFirestore.instance
-        .collection('ratings')
-        .doc(widget.site.id.toString())
+        .collection('reseñas')
+        .doc(widget.site.name)
         .collection('userRatings')
-        .doc(currentUser.uid)
-        .set({'rating': rating});
+        .doc(currentUser.email)
+        .set({'valoración': rating});
 
       _calculateAverageRating();
     } else {
