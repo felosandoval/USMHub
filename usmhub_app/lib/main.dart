@@ -9,11 +9,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-//import 'package:dropdown_search/dropdown_search.dart';
-//import 'package:firebase_messaging/firebase_messaging.dart';
-
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // PENDIENTE: Inicializar los widgets
+  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -40,7 +37,6 @@ Future<User?> signInWithGoogle(BuildContext context, Function callback) async {
   
   // Llama al callback para actualizar el estado
   callback();
-
   return userCredential.user;
 }
 
@@ -48,7 +44,6 @@ Future<void> signOutWithGoogle() async {
   await GoogleSignIn().signOut();
   await FirebaseAuth.instance.signOut();
 }
-
 
 void _showMessage(BuildContext context, String message) {
   ScaffoldMessenger.of(context).showSnackBar(
@@ -65,7 +60,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: false,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.blue, // Color base para generar la paleta
+          seedColor: Colors.blue,
         ),
       ),
       title: 'USM Hub',
@@ -79,8 +74,8 @@ class Subsystem {
   final String name;
   final String url;
   final String details;
-  final List<String> procedures; // Nuevo campo para trámites
-  final List<double> ratings; // Nuevo campo para calificaciones
+  final List<String> procedures;
+  final List<double> ratings;
 
   Subsystem({required this.id, required this.name, required this.url, required this.details, required this.procedures, required this.ratings});
 }
@@ -106,7 +101,6 @@ class _HomePageState extends State<HomePage> {
       ],
       ratings: [],
     ),
-    
     Subsystem(
       id: 2,
       name: 'Aula',
@@ -118,9 +112,7 @@ class _HomePageState extends State<HomePage> {
         'Ver calificaciones',
       ],
       ratings: [],
-
     ),
-    
     Subsystem(
       id: 3,
       name: 'Autoservicio',
@@ -133,7 +125,6 @@ class _HomePageState extends State<HomePage> {
       ],
       ratings: [],
     ),
-
     Subsystem(
       id: 4,
       name: 'Sireb',
@@ -146,7 +137,6 @@ class _HomePageState extends State<HomePage> {
       ],
       ratings: [],
     ),
-
     Subsystem(
       id: 5,
       name: 'Casino',
@@ -159,7 +149,6 @@ class _HomePageState extends State<HomePage> {
       ],
       ratings: [],
     ),
-
     Subsystem(
       id: 6,
       name: 'GitLab DINF',
@@ -172,7 +161,6 @@ class _HomePageState extends State<HomePage> {
       ],
       ratings: [],
     ),
-
     Subsystem(
       id: 7,
       name: 'GitLab LabComp',
@@ -185,7 +173,6 @@ class _HomePageState extends State<HomePage> {
       ],
       ratings: [],
     ),
-
     Subsystem(
       id: 8,
       name: 'Asuntos Internacionales',
@@ -198,7 +185,6 @@ class _HomePageState extends State<HomePage> {
       ],
       ratings: [],
     ),
-
     Subsystem(
       id: 9,
       name: 'Ass Ins',
@@ -211,7 +197,6 @@ class _HomePageState extends State<HomePage> {
       ],
       ratings: [],
     ),
-    // Más subsistemas aquí...
   ];
 
   List<Subsystem> filteredSites = [];
@@ -219,7 +204,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    filteredSites = allSites; // Inicialmente muestra todos los sitios
+    filteredSites = allSites;
   }
 
   @override
@@ -241,7 +226,6 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Column(
         children: [
-          // Buscador en tiempo real con margen lateral
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
             child: TextField(
@@ -259,26 +243,26 @@ class _HomePageState extends State<HomePage> {
                 hintText: 'Buscar sitios...',
                 hintStyle: GoogleFonts.openSans(
                   fontSize: 17,
-                  color: Colors.grey,  // Color del hint
+                  color: Colors.grey,
                 ),
               ),
             ),
           ),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),  // Margen solo a los lados
+              padding: const EdgeInsets.symmetric(horizontal: 15),
               child: GridView.builder(
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  crossAxisSpacing: 10.0,  // Espacio horizontal entre las cards
-                  mainAxisSpacing: 10.0,  // Espacio vertical entre las cards
+                  crossAxisSpacing: 10.0,
+                  mainAxisSpacing: 10.0,
                 ),
                 itemCount: filteredSites.length,
                 itemBuilder: (context, index) {
                   return Card(
                     color: Colors.green.shade100,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15.0),  // Bordes redondeados
+                      borderRadius: BorderRadius.circular(15.0),
                     ),
                     child: InkWell(
                       onTap: () {
@@ -331,7 +315,7 @@ class _UniversityCalendarState extends State<UniversityCalendar> {
             onDaySelected: (selectedDay, focusedDay) {
               setState(() {
                 _selectedDay = selectedDay;
-                _focusedDay = focusedDay; // PENDIENTE: Actualizar el día enfocado en el día seleccionado
+                _focusedDay = focusedDay;
               });
             },
             onFormatChanged: (format) {
@@ -342,11 +326,9 @@ class _UniversityCalendarState extends State<UniversityCalendar> {
               }
             },
             eventLoader: (day) {
-              // PENDIENTE: Cargar eventos aquí
-              return []; // Retorna una lista de eventos para el día
+              return [];
             },
             calendarStyle: CalendarStyle(
-              // Estilo del calendario
               selectedDecoration: BoxDecoration(
                 color: Colors.blue,
                 shape: BoxShape.circle,
@@ -357,7 +339,6 @@ class _UniversityCalendarState extends State<UniversityCalendar> {
               ),
             ),
             headerStyle: HeaderStyle(
-              // Estilo del encabezado
               formatButtonVisible: false,
               titleCentered: true,
             ),
@@ -413,15 +394,17 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
           setState(() {
             _userRating = doc['rating'];
           });
+        } else {
+          setState(() {
+            _userRating = null;
+          });
         }
 
         _calculateAverageRating();
       } catch (e) {
-        // Manejar el error aquí
         print('Error al obtener el rating del usuario: $e');
       }
     } else {
-      // Maneja el caso donde el usuario no ha iniciado sesión
       print('El usuario no ha iniciado sesión.');
     }
   }
@@ -434,7 +417,7 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
         if (attempt == retries - 1) {
           rethrow;
         }
-        await Future.delayed(Duration(seconds: 2 * (attempt + 1))); // Backoff exponencial
+        await Future.delayed(Duration(seconds: 2 * (attempt + 1)));
       }
     }
     throw Exception('Failed after $retries attempts');
@@ -470,7 +453,6 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
 
       _calculateAverageRating();
     } else {
-      // Maneja el caso donde el usuario no está autenticado
       print('El usuario no ha iniciado sesión.');
     }
   }
@@ -556,15 +538,14 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
                   },
                 ),
               ),
-              
               SizedBox(height: 20),
-              
-              // Add logout button
+              // Botón de cerrar sesión
               Center(
                 child: ElevatedButton(
                   onPressed: () async {
                     await signOutWithGoogle();
                     setState(() {});
+                    _checkUserRating();
                   },
                   child: Text('Cerrar sesión'),
                 ),
