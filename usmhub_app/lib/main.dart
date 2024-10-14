@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'screens/calendar_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -58,9 +58,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        useMaterial3: false,
+        useMaterial3:true,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.blue,
+          seedColor: Color.fromARGB(255, 247, 173, 1),
         ),
       ),
       title: 'USM Hub',
@@ -151,7 +151,7 @@ class _HomePageState extends State<HomePage> {
     ),
     Subsystem(
       id: 6,
-      name: 'GitLab DINF',
+      name: 'Gitlab DINF',
       url: 'https://gitlab.inf.utfsm.cl/',
       details: 'A.',
       procedures: [
@@ -163,7 +163,7 @@ class _HomePageState extends State<HomePage> {
     ),
     Subsystem(
       id: 7,
-      name: 'GitLab LabComp',
+      name: 'Gitlab Labcom',
       url: 'https://gitlab.labcomp.cl/',
       details: 'A.',
       procedures: [
@@ -219,7 +219,7 @@ class _HomePageState extends State<HomePage> {
           IconButton(
             icon: Icon(Icons.calendar_today),
             onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => UniversityCalendar()));
+              Navigator.push(context, MaterialPageRoute(builder: (_) => CalendarPage()));
             },
           ),
         ],
@@ -260,7 +260,7 @@ class _HomePageState extends State<HomePage> {
                 itemCount: filteredSites.length,
                 itemBuilder: (context, index) {
                   return Card(
-                    color: Colors.green.shade100,
+                    color: Color.fromARGB(199, 0, 75, 133),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15.0),
                     ),
@@ -274,73 +274,19 @@ class _HomePageState extends State<HomePage> {
                         );
                       },
                       child: Center(
-                        child: Text(filteredSites[index].name),
+                        child: Text(
+                          filteredSites[index].name,
+                           textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                          ),
+                        ),
                       ),
                     ),
                   );
                 }
               ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class UniversityCalendar extends StatefulWidget {
-  @override
-  _UniversityCalendarState createState() => _UniversityCalendarState();
-}
-
-class _UniversityCalendarState extends State<UniversityCalendar> {
-  CalendarFormat _calendarFormat = CalendarFormat.month;
-  DateTime _focusedDay = DateTime.now();
-  DateTime? _selectedDay;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Calendario Universitario')),
-      body: Column(
-        children: [
-          TableCalendar(
-            focusedDay: _focusedDay,
-            firstDay: DateTime.utc(2020, 1, 1),
-            lastDay: DateTime.utc(2030, 12, 31),
-            calendarFormat: _calendarFormat,
-            selectedDayPredicate: (day) {
-              return isSameDay(_selectedDay, day);
-            },
-            onDaySelected: (selectedDay, focusedDay) {
-              setState(() {
-                _selectedDay = selectedDay;
-                _focusedDay = focusedDay;
-              });
-            },
-            onFormatChanged: (format) {
-              if (_calendarFormat != format) {
-                setState(() {
-                  _calendarFormat = format;
-                });
-              }
-            },
-            eventLoader: (day) {
-              return [];
-            },
-            calendarStyle: CalendarStyle(
-              selectedDecoration: BoxDecoration(
-                color: Colors.blue,
-                shape: BoxShape.circle,
-              ),
-              todayDecoration: BoxDecoration(
-                color: Colors.orange,
-                shape: BoxShape.circle,
-              ),
-            ),
-            headerStyle: HeaderStyle(
-              formatButtonVisible: false,
-              titleCentered: true,
             ),
           ),
         ],
@@ -361,6 +307,7 @@ class SiteDetailPage extends StatefulWidget {
 class _SiteDetailPageState extends State<SiteDetailPage> {
   double? _userRating;
   double _averageRating = 0.0;
+  int _totalReviews = 0;
   final user = FirebaseAuth.instance.currentUser;
 
   @override
@@ -423,6 +370,16 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
     throw Exception('Failed after $retries attempts');
   }
 
+  Future<int> _getTotalReviews() async {
+    final snapshot = await FirebaseFirestore.instance
+        .collection('reseñas')
+        .doc(widget.site.name)
+        .collection('userRatings')
+        .get();
+
+    return snapshot.docs.length;
+  }
+
   void _calculateAverageRating() async {
     final snapshot = await FirebaseFirestore.instance
         .collection('reseñas')
@@ -435,6 +392,10 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
       if (mounted) {
         setState(() {
           _averageRating = totalRatings / snapshot.docs.length;
+          _totalReviews = snapshot.docs.length;
+          print("print");
+          print(totalRatings);
+          print(snapshot.docs.length);
         });
       }
     }
@@ -465,13 +426,9 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
       appBar: AppBar(
         title: Row(
           children: [
-            Text(widget.site.name),
+            Text("Información del sitio"),
             SizedBox(width: 10),
-            if (_averageRating > 0)
-              Text(
-                _averageRating.toStringAsFixed(1),
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
+            
           ],
         ),
       ),
@@ -480,13 +437,59 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              widget.site.name,
-              style: GoogleFonts.roboto(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  widget.site.name,
+                  style: GoogleFonts.roboto(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-            ),
+              Spacer(),
+              if (_averageRating > 0)
+                Row(
+                  children: [
+                    Icon(
+                      Icons.star,
+                      color: Colors.amber, // Puedes cambiar el color si prefieres otro
+                    ),
+                    SizedBox(width: 5),
+                    Text(
+                      _averageRating.toStringAsFixed(1),
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(width: 5),
+                    FutureBuilder<int>(
+                      future: _getTotalReviews(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return Text(
+                            '(cargando reseñas)',
+                            style: TextStyle(fontSize: 16, color: Colors.grey),
+                          );
+                        } else if (snapshot.hasError) {
+                          return Text(
+                            '($_totalReviews reseñas)', // Mostrar el total de reseñas que tenemos
+                            style: TextStyle(fontSize: 16, color: Colors.grey),
+                          );
+                        } else {
+                          return Text(
+                            '(${snapshot.data ?? _totalReviews} reseñas)', // Mostrar el total de reseñas del snapshot o el total que tenemos
+                            style: TextStyle(fontSize: 16, color: Colors.grey),
+                          );
+                        }
+                      },
+                    ),
+
+                  ],
+                ),
+
+            ],
+          ),
+
             SizedBox(height: 10),
             Text(
               widget.site.details,
@@ -519,25 +522,36 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
             if (user != null) ...[
               // RESEÑAS (5 ESTRELLAS)
               Center(
-                child: RatingBar.builder(
-                  initialRating: _userRating ?? 0.0,
-                  minRating: 1,
-                  direction: Axis.horizontal,
-                  allowHalfRating: true,
-                  itemCount: 5,
-                  itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-                  itemBuilder: (context, _) => Icon(
-                    Icons.star,
-                    color: Colors.amber,
-                  ),
-                  onRatingUpdate: (rating) {
-                    setState(() {
-                      _userRating = rating;
-                    });
-                    _submitRating(rating);
-                  },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    RatingBar.builder(
+                      initialRating: _userRating ?? 0.0,
+                      minRating: 1,
+                      direction: Axis.horizontal,
+                      allowHalfRating: true,
+                      itemCount: 5,
+                      itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                      itemBuilder: (context, _) => Icon(
+                        Icons.star,
+                        color: Colors.amber,
+                      ),
+                      onRatingUpdate: (rating) {
+                        setState(() {
+                          _userRating = rating;
+                        });
+                        _submitRating(rating);
+                      },
+                    ),
+                    SizedBox(width: 10), // Espacio entre las estrellas y el texto
+                    Text(
+                      _userRating?.toStringAsFixed(1) ?? '0.0',
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                  ],
                 ),
               ),
+
               SizedBox(height: 20),
               // Botón de cerrar sesión
               Center(

@@ -1,0 +1,207 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Vicerrectoría Académica - ECPv6.2.8.1//NONSGML v1.0//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Vicerrectoría Académica
+X-ORIGINAL-URL:https://vra.usm.cl
+X-WR-CALDESC:Eventos para Vicerrectoría Académica
+REFRESH-INTERVAL;VALUE=DURATION:PT1H
+X-Robots-Tag:noindex
+X-PUBLISHED-TTL:PT1H
+BEGIN:VTIMEZONE
+TZID:America/Halifax
+BEGIN:DAYLIGHT
+TZOFFSETFROM:-0400
+TZOFFSETTO:-0300
+TZNAME:ADT
+DTSTART:20240310T060000
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:-0300
+TZOFFSETTO:-0400
+TZNAME:AST
+DTSTART:20241103T050000
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20241203
+DTEND;VALUE=DATE:20241204
+DTSTAMP:20241013T194838
+CREATED:20231201T135537Z
+LAST-MODIFIED:20231201T135537Z
+UID:10000101-1733184000-1733270399@vra.usm.cl
+SUMMARY:Ceremonia de titulación Estudiantes pregrado Campus Santiago San Joaquín.
+DESCRIPTION:
+URL:https://vra.usm.cl/evento/ceremonia-de-titulacion-estudiantes-pregrado-campus-santiago-san-joaquin/
+CATEGORIES:Ceremonias
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20241204
+DTEND;VALUE=DATE:20241205
+DTSTAMP:20241013T194838
+CREATED:20231201T135604Z
+LAST-MODIFIED:20231201T135604Z
+UID:10000102-1733270400-1733356799@vra.usm.cl
+SUMMARY:Ceremonia de titulación Estudiantes pregrado Campus Santiago Vitacura.
+DESCRIPTION:
+URL:https://vra.usm.cl/evento/ceremonia-de-titulacion-estudiantes-pregrado-campus-santiago-vitacura/
+CATEGORIES:Ceremonias
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20241206
+DTEND;VALUE=DATE:20241207
+DTSTAMP:20241013T194838
+CREATED:20231201T135630Z
+LAST-MODIFIED:20231201T135630Z
+UID:10000103-1733443200-1733529599@vra.usm.cl
+SUMMARY:Plazo Profesores ingresen en plataforma SIGA notas finales en asignaturas 2024-2 para carreras régimen diurno y programas de postgrado profesionales y científicos.
+DESCRIPTION:
+URL:https://vra.usm.cl/evento/plazo-profesores-ingresen-en-plataforma-siga-notas-finales-en-asignaturas-2024-2-para-carreras-regimen-diurno-y-programas-de-postgrado-profesionales-y-cientificos/
+CATEGORIES:Profesores
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20241206
+DTEND;VALUE=DATE:20241207
+DTSTAMP:20241013T194838
+CREATED:20231201T135654Z
+LAST-MODIFIED:20231201T135654Z
+UID:10000104-1733443200-1733529599@vra.usm.cl
+SUMMARY:Día de la Secretaría 2024.
+DESCRIPTION:
+URL:https://vra.usm.cl/evento/dia-de-la-secretaria-2024/
+CATEGORIES:Comunidad USM
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20241206
+DTEND;VALUE=DATE:20241207
+DTSTAMP:20241013T194838
+CREATED:20231211T171237Z
+LAST-MODIFIED:20240325T195847Z
+UID:10000154-1733443200-1733529599@vra.usm.cl
+SUMMARY:Término Clases (Periodo Lectivo) Segundo Semestre 2024 para carreras de pregrado diurno y programas de postgrado científico-tecnológico.
+DESCRIPTION:
+URL:https://vra.usm.cl/evento/termino-del-periodo-lectivo-segundo-semestre-2024-para-carreras-de-pregrado-diurno-y-programas-de-postgrado-cientifico-tecnologico/
+CATEGORIES:Comunidad USM
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20241209
+DTEND;VALUE=DATE:20241212
+DTSTAMP:20241013T194838
+CREATED:20231201T135725Z
+LAST-MODIFIED:20231201T135725Z
+UID:10000105-1733702400-1733961599@vra.usm.cl
+SUMMARY:Ceremonia de titulación Estudiantes pregrado Sede Viña del Mar.
+DESCRIPTION:
+URL:https://vra.usm.cl/evento/ceremonia-de-titulacion-estudiantes-pregrado-sede-vina-del-mar/
+CATEGORIES:Ceremonias
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20241211
+DTEND;VALUE=DATE:20241212
+DTSTAMP:20241013T194838
+CREATED:20231201T135754Z
+LAST-MODIFIED:20231211T122541Z
+UID:10000106-1733875200-1733961599@vra.usm.cl
+SUMMARY:Inicio Programa Académico Estudiantil 2024.
+DESCRIPTION:
+URL:https://vra.usm.cl/evento/programa-academico-estudiantil-2024/
+CATEGORIES:Estudiantes
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20241219
+DTEND;VALUE=DATE:20241220
+DTSTAMP:20241013T194838
+CREATED:20231201T135837Z
+LAST-MODIFIED:20231201T135837Z
+UID:10000107-1734566400-1734652799@vra.usm.cl
+SUMMARY:Ceremonia de titulación Estudiantes pregrado Campus Casa Central Valparaíso.
+DESCRIPTION:
+URL:https://vra.usm.cl/evento/ceremonia-de-titulacion-estudiantes-pregrado-campus-casa-central-valparaiso/
+CATEGORIES:Ceremonias
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20241220
+DTEND;VALUE=DATE:20241221
+DTSTAMP:20241013T194838
+CREATED:20231201T135904Z
+LAST-MODIFIED:20231201T135904Z
+UID:10000108-1734652800-1734739199@vra.usm.cl
+SUMMARY:EDDA: Plazo para que los profesores ingresen en la plataforma EDDA el informe de actividades realizado en 2024.
+DESCRIPTION:
+URL:https://vra.usm.cl/evento/edda-plazo-para-que-los-profesores-ingresen-en-la-plataforma-edda-el-informe-de-actividades-realizado-en-2024/
+CATEGORIES:Profesores
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20241220
+DTEND;VALUE=DATE:20241221
+DTSTAMP:20241013T194838
+CREATED:20231201T135928Z
+LAST-MODIFIED:20231201T135928Z
+UID:10000109-1734652800-1734739199@vra.usm.cl
+SUMMARY:Ceremonia de titulación Estudiantes postgrados.
+DESCRIPTION:
+URL:https://vra.usm.cl/evento/ceremonia-de-titulacion-estudiantes-postgrados/
+CATEGORIES:Ceremonias
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20241224
+DTEND;VALUE=DATE:20241225
+DTSTAMP:20241013T194838
+CREATED:20231201T135952Z
+LAST-MODIFIED:20231201T135952Z
+UID:10000110-1734998400-1735084799@vra.usm.cl
+SUMMARY:Suspensión de actividades Académicas y Administrativas\, excepto aquellos servicios que deban mantenerse.
+DESCRIPTION:
+URL:https://vra.usm.cl/evento/suspension-de-actividades-academicas-y-administrativas-excepto-aquellos-servicios-que-deban-mantenerse-3/
+CATEGORIES:Comunidad USM
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20241227
+DTEND;VALUE=DATE:20241228
+DTSTAMP:20241013T194838
+CREATED:20231201T140025Z
+LAST-MODIFIED:20231201T140025Z
+UID:10000111-1735257600-1735343999@vra.usm.cl
+SUMMARY:Término del plazo de presentación de solicitudes en el 1er semestre académico para ser considerado estudiante ausente (retiro temporal o congelamiento); retirarse definitivamente de la Universidad sin llevar notas (estudiantes pregrado vespertino régimen semestral).
+DESCRIPTION:
+URL:https://vra.usm.cl/evento/termino-del-plazo-de-presentacion-de-solicitudes-en-el-1er-semestre-academico-para-ser-considerado-estudiante-ausente-retiro-temporal-o-congelamiento-retirarse-definitivamente-de-la-universidad-sin-3/
+CATEGORIES:Estudiantes,Jefes de Carrera,Profesores
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20241227
+DTEND;VALUE=DATE:20241228
+DTSTAMP:20241013T194838
+CREATED:20231201T140113Z
+LAST-MODIFIED:20231201T140113Z
+UID:10000112-1735257600-1735343999@vra.usm.cl
+SUMMARY:Plazo Profesores ingresen en plataforma SIGA notas finales en asignaturas 2024-2 para carreras régimen vespertino (semestral).
+DESCRIPTION:
+URL:https://vra.usm.cl/evento/plazo-profesores-ingresen-en-plataforma-siga-notas-finales-en-asignaturas-2024-2-para-carreras-regimen-vespertino-semestral/
+CATEGORIES:Profesores
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20241227
+DTEND;VALUE=DATE:20241228
+DTSTAMP:20241013T194838
+CREATED:20231211T175212Z
+LAST-MODIFIED:20240325T195803Z
+UID:10000163-1735257600-1735343999@vra.usm.cl
+SUMMARY:Término Clases (Periodo Lectivo) Segundo Semestre 2024 para Carreras de Pregrado Jornada Vespertina (Régimen Semestral)
+DESCRIPTION:
+URL:https://vra.usm.cl/evento/termino-periodo-lectivo-segundo-semestre-2024-para-carreras-de-pregrado-jornada-vespertina-regimen-semestral/
+CATEGORIES:Comunidad USM
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20241231
+DTEND;VALUE=DATE:20250101
+DTSTAMP:20241013T194838
+CREATED:20231201T140141Z
+LAST-MODIFIED:20231201T140141Z
+UID:10000113-1735603200-1735689599@vra.usm.cl
+SUMMARY:Suspensión de actividades Académicas y Administrativas\, excepto aquellos servicios que deban mantenerse.
+DESCRIPTION:
+URL:https://vra.usm.cl/evento/suspension-de-actividades-academicas-y-administrativas-excepto-aquellos-servicios-que-deban-mantenerse-4/
+CATEGORIES:Comunidad USM
+END:VEVENT
+END:VCALENDAR

@@ -1,0 +1,147 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Vicerrectoría Académica - ECPv6.2.8.1//NONSGML v1.0//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Vicerrectoría Académica
+X-ORIGINAL-URL:https://vra.usm.cl
+X-WR-CALDESC:Eventos para Vicerrectoría Académica
+REFRESH-INTERVAL;VALUE=DURATION:PT1H
+X-Robots-Tag:noindex
+X-PUBLISHED-TTL:PT1H
+BEGIN:VTIMEZONE
+TZID:America/Halifax
+BEGIN:DAYLIGHT
+TZOFFSETFROM:-0400
+TZOFFSETTO:-0300
+TZNAME:ADT
+DTSTART:20240310T060000
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:-0300
+TZOFFSETTO:-0400
+TZNAME:AST
+DTSTART:20241103T050000
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20241107
+DTEND;VALUE=DATE:20241108
+DTSTAMP:20241013T194503
+CREATED:20231201T135253Z
+LAST-MODIFIED:20231201T135253Z
+UID:10000096-1730937600-1731023999@vra.usm.cl
+SUMMARY:Término de plazo para que los Departamentos Académicos y docentes de Campus Santiago y Sede Viña del Mar propongan a la Vicerrectoría Académica los nombres de los candidatos a distinciones académicas que cumplan con los requisitos para participar en ceremonia entrega de títulos 2024.
+DESCRIPTION:
+URL:https://vra.usm.cl/evento/termino-de-plazo-para-que-los-departamentos-academicos-y-docentes-de-campus-santiago-y-sede-vina-del-mar-propongan-a-la-vicerrectoria-academica-los-nombres-de-los-candidatos-a-distinciones-academicas/
+CATEGORIES:Jefes de Carrera,Profesores
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20241108
+DTEND;VALUE=DATE:20241109
+DTSTAMP:20241013T194503
+CREATED:20231201T135316Z
+LAST-MODIFIED:20231201T135316Z
+UID:10000097-1731024000-1731110399@vra.usm.cl
+SUMMARY:Término del plazo de presentación de solicitudes en el 2do semestre académico para ser considerado estudiante ausente (retiro temporal o congelamiento); retirarse definitivamente de la Universidad sin llevar notas (estudiantes pregrado diurno).
+DESCRIPTION:
+URL:https://vra.usm.cl/evento/termino-del-plazo-de-presentacion-de-solicitudes-en-el-2do-semestre-academico-para-ser-considerado-estudiante-ausente-retiro-temporal-o-congelamiento-retirarse-definitivamente-de-la-universidad-sin/
+CATEGORIES:Estudiantes,Jefes de Carrera,Profesores
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20241108
+DTEND;VALUE=DATE:20241109
+DTSTAMP:20241013T194503
+CREATED:20231211T171659Z
+LAST-MODIFIED:20231211T171659Z
+UID:10000155-1731024000-1731110399@vra.usm.cl
+SUMMARY:Término de solicitudes asociadas a bajas cargas académicas: matrícula sin ramos y alumno regular dedicación parcial.
+DESCRIPTION:
+URL:https://vra.usm.cl/evento/termino-de-solicitudes-asociadas-a-bajas-cargas-academicas-matricula-sin-ramos-y-alumno-regular-dedicacion-parcial-2/
+CATEGORIES:Estudiantes,Jefes de Carrera
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20241108
+DTEND;VALUE=DATE:20241109
+DTSTAMP:20241013T194503
+CREATED:20231211T174932Z
+LAST-MODIFIED:20231211T174932Z
+UID:10000161-1731024000-1731110399@vra.usm.cl
+SUMMARY:Término de solicitudes desinscripción VRA N°459/96.
+DESCRIPTION:
+URL:https://vra.usm.cl/evento/termino-de-solicitudes-desinscripcion-vra-n459-96/
+CATEGORIES:Estudiantes,Jefes de Carrera
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20241108
+DTEND;VALUE=DATE:20241109
+DTSTAMP:20241013T194503
+CREATED:20231211T175046Z
+LAST-MODIFIED:20231211T175046Z
+UID:10000162-1731024000-1731110399@vra.usm.cl
+SUMMARY:Término Rebaja Académica Voluntaria 2024-2\, estudiantes de pregrado diurno.
+DESCRIPTION:
+URL:https://vra.usm.cl/evento/termino-rebaja-academica-voluntaria-2024-2-estudiantes-de-pregrado-diurno/
+CATEGORIES:Estudiantes,Jefes de Carrera
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20241114
+DTEND;VALUE=DATE:20241115
+DTSTAMP:20241013T194503
+CREATED:20231201T135222Z
+LAST-MODIFIED:20231201T135222Z
+UID:10000095-1731542400-1731628799@vra.usm.cl
+SUMMARY:Término de plazo para que los alumnos de Campus Casa Central Valparaíso y Sede Concepción rindan su Examen de Título para participar de la Ceremonia de Titulación 2024.
+DESCRIPTION:
+URL:https://vra.usm.cl/evento/termino-de-plazo-para-que-los-alumnos-de-campus-casa-central-valparaiso-y-sede-concepcion-rindan-su-examen-de-titulo-para-participar-de-la-ceremonia-de-titulacion-2024/
+CATEGORIES:Estudiantes,Jefes de Carrera,Profesores
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20241121
+DTEND;VALUE=DATE:20241122
+DTSTAMP:20241013T194503
+CREATED:20231201T135350Z
+LAST-MODIFIED:20231201T135350Z
+UID:10000098-1732147200-1732233599@vra.usm.cl
+SUMMARY:Ceremonia de distinción a estudiantes por participación en actividades extra-programáticas.
+DESCRIPTION:
+URL:https://vra.usm.cl/evento/ceremonia-de-distincion-a-estudiantes-por-participacion-en-actividades-extra-programaticas/
+CATEGORIES:Ceremonias
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20241122
+DTEND;VALUE=DATE:20241123
+DTSTAMP:20241013T194503
+CREATED:20231201T135414Z
+LAST-MODIFIED:20231201T135414Z
+UID:10000099-1732233600-1732319999@vra.usm.cl
+SUMMARY:Término de plazo para que los Departamentos Académicos y docentes de Campus Casa Central Valparaíso y Sede Concepción propongan a la Vicerrectoría Académica los nombres de los candidatos a distinciones académicas que cumplan con los requisitos para participar en ceremonia entrega de títulos 2024.
+DESCRIPTION:
+URL:https://vra.usm.cl/evento/termino-de-plazo-para-que-los-departamentos-academicos-y-docentes-de-campus-casa-central-valparaiso-y-sede-concepcion-propongan-a-la-vicerrectoria-academica-los-nombres-de-los-candidatos-a-distincione/
+CATEGORIES:Jefes de Carrera,Profesores
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20241127
+DTEND;VALUE=DATE:20241128
+DTSTAMP:20241013T194503
+CREATED:20231201T135516Z
+LAST-MODIFIED:20231201T135516Z
+UID:10000100-1732665600-1732751999@vra.usm.cl
+SUMMARY:Dirección de Estudios y Dirección Académica entrega lista de Titulados Campus Casa Central Valparaíso y Sede Concepción a Secretaría General.
+DESCRIPTION:
+URL:https://vra.usm.cl/evento/direccion-de-estudios-y-direccion-academica-entrega-lista-de-titulados-campus-casa-central-valparaiso-y-sede-concepcion-a-secretaria-general/
+CATEGORIES:Estudiantes,Jefes de Carrera,Profesores
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20241129
+DTEND;VALUE=DATE:20241130
+DTSTAMP:20241013T194503
+CREATED:20231211T175650Z
+LAST-MODIFIED:20231211T175650Z
+UID:10000165-1732838400-1732924799@vra.usm.cl
+SUMMARY:Término Programación Académica 2025-1.
+DESCRIPTION:
+URL:https://vra.usm.cl/evento/termino-programacion-academica-2025-1/
+CATEGORIES:Jefes de Carrera,Profesores
+END:VEVENT
+END:VCALENDAR
