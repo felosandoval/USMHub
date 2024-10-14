@@ -774,7 +774,7 @@ class _RankingsPageState extends State<RankingsPage> {
               subtitle: Text(
                 site.averageRating == 0
                   ? 'Sin valoraciones'
-                  : 'Average Rating: ${site.averageRating.toStringAsFixed(2)}',
+                  : 'Valoración promedio: ${site.averageRating.toStringAsFixed(1)}',
               ),
               trailing: Icon(Icons.star, color: Colors.amber),
             ),
