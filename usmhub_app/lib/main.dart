@@ -86,6 +86,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  TextEditingController textEditingController = TextEditingController();
   List<Subsystem> allSites = [
     Subsystem(
       id: 1,
@@ -122,6 +123,9 @@ class _HomePageState extends State<HomePage> {
         'Participar en foros',
         'Entregar tareas',
         'Ver calificaciones',
+        'Pagos ayudantía',
+        'Pagar deudas'
+
       ],
       ratings: [],
     ),
@@ -144,7 +148,7 @@ class _HomePageState extends State<HomePage> {
       details: 'A.',
       procedures: [
         'Ver alimentos',
-        'A',
+        'Ver almuerzos',
         'A',
       ],
       ratings: [],
@@ -187,8 +191,20 @@ class _HomePageState extends State<HomePage> {
     ),
     Subsystem(
       id: 9,
-      name: 'Ass Ins',
-      url: 'https://oai.usm.cl/',
+      name: 'Minuta',
+      url: 'https://vrea.usm.cl/minuta-alimentacion/',
+      details: '.',
+      procedures: [
+        'A',
+        'A',
+        'A',
+      ],
+      ratings: [],
+    ),
+    Subsystem(
+      id: 10,
+      name: 'Trabaja con nosotros',
+      url: 'https://usm.hiringroom.com/jobs',
       details: 'A.',
       procedures: [
         'A',
@@ -197,14 +213,44 @@ class _HomePageState extends State<HomePage> {
       ],
       ratings: [],
     ),
+    Subsystem(
+      id: 11,
+      name: 'USM X',
+      url: 'https://usmx.cl/',
+      details: 'Plataforma de cursos abiertos en línea.',
+      procedures: [
+        'A',
+        'A',
+        'A',
+      ],
+      ratings: [],
+    ),
+    Subsystem(
+      id: 12,
+      name: 'Directorio',
+      url: 'https://www.directorio.usm.cl/',
+      details: 'A.',
+      procedures: [
+        'A',
+        'A',
+        'A',
+      ],
+      ratings: [],
+    ),
+    // Otros subsistemas aquí...
   ];
-
   List<Subsystem> filteredSites = [];
 
   @override
   void initState() {
     super.initState();
     filteredSites = allSites;
+  }
+
+  @override
+  void dispose() {
+    textEditingController.dispose();
+    super.dispose();
   }
 
   @override
@@ -229,6 +275,7 @@ class _HomePageState extends State<HomePage> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
             child: TextField(
+              controller: textEditingController,
               onChanged: (text) {
                 setState(() {
                   filteredSites = allSites.where((site) {
@@ -244,6 +291,15 @@ class _HomePageState extends State<HomePage> {
                 hintStyle: GoogleFonts.openSans(
                   fontSize: 17,
                   color: Colors.grey,
+                ),
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.clear),
+                  onPressed: () {
+                    setState(() {
+                      filteredSites = allSites;
+                    });
+                    textEditingController.clear();
+                  },
                 ),
               ),
             ),
@@ -276,7 +332,7 @@ class _HomePageState extends State<HomePage> {
                       child: Center(
                         child: Text(
                           filteredSites[index].name,
-                           textAlign: TextAlign.center,
+                          textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 18,
@@ -285,7 +341,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   );
-                }
+                },
               ),
             ),
           ),

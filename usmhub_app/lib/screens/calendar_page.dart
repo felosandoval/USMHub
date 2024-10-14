@@ -32,49 +32,44 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   Future<void> _loadIcsFiles() async {
-    List<Meeting> loadedMeetings = [];
-
-    for (String icsFile in icsFiles) {
-      // Cargar cada archivo .ics desde los assets
-      final icsString = await rootBundle.loadString(icsFile);
-      final icalendar = ICalendar.fromString(icsString);
-
-      // Extraer los eventos (VEVENT) del archivo ICS
-      final events = icalendar.data.where((component) => component['type'] == 'VEVENT');
-
-      for (var event in events) {
-        final startDate = event['dtstart']?.dt;
-        final endDate = event['dtend']?.dt;
-        final summary = event['summary'] ?? 'Sin título';
-
-        // Extraer la categoría del evento
-        String category = 'Default';
-        if (event['categories'] != null) {
-          var categories = event['categories'];
-          if (categories is List) {
-            category = categories[0];
-          } else if (categories is String) {
-            category = categories;
-          }
-        }
-
-        if (startDate != null) {
-          DateTime eventStartDate = DateTime.parse(startDate.toString());
-          DateTime eventEndDate = (endDate != null) ? DateTime.parse(endDate.toString()) : eventStartDate;
-
-          // Obtener el color basado en la categoría
-          Color eventColor = _getColorForCategory(category);
-
-          // Crear un evento Meeting para Syncfusion con el color específico
-          loadedMeetings.add(Meeting(summary, eventStartDate, eventEndDate, eventColor, false));
+  List<Meeting> loadedMeetings = [];
+  for (String icsFile in icsFiles) {
+    // Cargar cada archivo .ics desde los assets
+    final icsString = await rootBundle.loadString(icsFile);
+    final icalendar = ICalendar.fromString(icsString);
+    // Extraer los eventos (VEVENT) del archivo ICS
+    final events = icalendar.data.where((component) => component['type'] == 'VEVENT');
+    for (var event in events) {
+      final startDate = event['dtstart']?.dt;
+      final endDate = event['dtend']?.dt;
+      final summary = event['summary'] ?? 'Sin título';
+      // Extraer la categoría del evento
+      String category = 'Default';
+      if (event['categories'] != null) {
+        var categories = event['categories'];
+        if (categories is List) {
+          category = categories[0];
+        } else if (categories is String) {
+          category = categories;
         }
       }
+      if (startDate != null) {
+        DateTime eventStartDate = DateTime.parse(startDate.toString());
+        DateTime eventEndDate = (endDate != null) 
+          ? DateTime.parse(endDate.toString()).subtract(Duration(days: 1))
+          : eventStartDate;
+        // Obtener el color basado en la categoría
+        Color eventColor = _getColorForCategory(category);
+        // Crear un evento Meeting para Syncfusion con el color específico
+        loadedMeetings.add(Meeting(summary, eventStartDate, eventEndDate, eventColor, false));
+      }
     }
-
-    setState(() {
-      meetings = loadedMeetings;
-    });
   }
+  setState(() {
+    meetings = loadedMeetings;
+  });
+}
+
 
   // Función para obtener el color basado en la categoría
   Color _getColorForCategory(String category) {
@@ -98,7 +93,7 @@ class _CalendarPageState extends State<CalendarPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Calendario de Eventos'),
+        title: Text('Calendario USM'),
       ),
       body: Column(
         children: [
@@ -118,7 +113,15 @@ class _CalendarPageState extends State<CalendarPage> {
                     Expanded(
                       child: Row(
                         children: [
-                          Container(width: 16, height: 16, color: Colors.orange),
+                          Container(
+                            width: 16,
+                            height: 16,
+                            decoration: BoxDecoration(
+                              color: Colors.orange,
+                              borderRadius: BorderRadius.circular(5), // Ajusta el radio para hacer el borde más o menos redondeado
+                            ),
+                          ),
+
                           SizedBox(width: 8),
                           Text('Estudiantes'),
                         ],
@@ -127,7 +130,15 @@ class _CalendarPageState extends State<CalendarPage> {
                     Expanded(
                       child: Row(
                         children: [
-                          Container(width: 16, height: 16, color: Colors.red),
+                          Container(
+                            width: 16,
+                            height: 16,
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(5), // Ajusta el radio para hacer el borde más o menos redondeado
+                            ),
+                          ),
+
                           SizedBox(width: 8),
                           Text('Profesores'),
                         ],
@@ -136,7 +147,15 @@ class _CalendarPageState extends State<CalendarPage> {
                     Expanded(
                       child: Row(
                         children: [
-                          Container(width: 16, height: 16, color: Colors.green),
+                          Container(
+                            width: 16,
+                            height: 16,
+                            decoration: BoxDecoration(
+                              color: Colors.green,
+                              borderRadius: BorderRadius.circular(5), // Ajusta el radio para hacer el borde más o menos redondeado
+                            ),
+                          ),
+
                           SizedBox(width: 8),
                           Text('Jefes de Carrera'),
                         ],
@@ -150,7 +169,15 @@ class _CalendarPageState extends State<CalendarPage> {
                     Expanded(
                       child: Row(
                         children: [
-                          Container(width: 16, height: 16, color: Colors.blue),
+                          Container(
+                            width: 16,
+                            height: 16,
+                            decoration: BoxDecoration(
+                              color: Colors.blue,
+                              borderRadius: BorderRadius.circular(5), // Ajusta el radio para hacer el borde más o menos redondeado
+                            ),
+                          ),
+
                           SizedBox(width: 8),
                           Text('Ceremonias'),
                         ],
@@ -159,7 +186,15 @@ class _CalendarPageState extends State<CalendarPage> {
                     Expanded(
                       child: Row(
                         children: [
-                          Container(width: 16, height: 16, color: Colors.purple),
+                          Container(
+                            width: 16,
+                            height: 16,
+                            decoration: BoxDecoration(
+                              color: Colors.purple,
+                              borderRadius: BorderRadius.circular(5), // Ajusta el radio para hacer el borde más o menos redondeado
+                            ),
+                          ),
+
                           SizedBox(width: 8),
                           Text('Comunidad'),
                         ],
@@ -168,7 +203,15 @@ class _CalendarPageState extends State<CalendarPage> {
                     Expanded(
                       child: Row(
                         children: [
-                          Container(width: 16, height: 16, color: Colors.grey),
+                          Container(
+                            width: 16,
+                            height: 16,
+                            decoration: BoxDecoration(
+                              color: Colors.grey,
+                              borderRadius: BorderRadius.circular(5), // Ajusta el radio para hacer el borde más o menos redondeado
+                            ),
+                          ),
+
                           SizedBox(width: 8),
                           Text('Otros'),
                         ],
@@ -235,20 +278,6 @@ class _CalendarPageState extends State<CalendarPage> {
                                   ],
                                 ),
                               ),
-
-                              Text(""),
-                              RichText(
-                                text: TextSpan(
-                                  children: [
-                                    TextSpan(
-                                      text: "Descripción: ",
-                                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black), // En negrita y color negro
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              Text("${meeting.eventName}", textAlign: TextAlign.justify,),
                             ],
                           ),
                           actions: [
