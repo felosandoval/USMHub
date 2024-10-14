@@ -437,18 +437,21 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-          Row(
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Text(
-                  widget.site.name,
-                  style: GoogleFonts.roboto(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
+              Text(
+                widget.site.name,
+                style: GoogleFonts.roboto(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
                 ),
+                overflow: TextOverflow.visible,
+                maxLines: null,
+                softWrap: true,
               ),
-              Spacer(),
+              SizedBox(height: 5), // Espacio entre el nombre y las reseñas
               if (_averageRating > 0)
                 Row(
                   children: [
@@ -483,12 +486,11 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
                         }
                       },
                     ),
-
                   ],
                 ),
-
             ],
           ),
+
 
             SizedBox(height: 10),
             Text(

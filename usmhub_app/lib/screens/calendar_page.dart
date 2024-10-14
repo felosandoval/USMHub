@@ -3,7 +3,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:icalendar_parser/icalendar_parser.dart';
 import '../models/meeting.dart';
-
+import 'package:intl/intl.dart';
 
 class CalendarPage extends StatefulWidget {
   @override
@@ -20,6 +20,10 @@ class _CalendarPageState extends State<CalendarPage> {
     'assets/calendars/2024-12.ics',
     // Agrega más archivos según sea necesario
   ];
+
+  String formatDateTime(DateTime dateTime) {
+    return DateFormat('yyyy-MM-dd HH:mm').format(dateTime);
+  }
 
   @override
   void initState() {
@@ -76,13 +80,13 @@ class _CalendarPageState extends State<CalendarPage> {
   Color _getColorForCategory(String category) {
     switch (category.toLowerCase()) {
       case 'estudiantes':
-        return Colors.blue;
-      case 'profesores':
-        return Colors.green;
-      case 'jefes de carrera':
         return Colors.orange;
-      case 'ceremonias':
+      case 'profesores':
         return Colors.red;
+      case 'jefes de carrera':
+        return Colors.green;
+      case 'ceremonias':
+        return Colors.blue;
       case 'comunidad usm':
         return Colors.purple;
       default:
@@ -96,22 +100,179 @@ class _CalendarPageState extends State<CalendarPage> {
       appBar: AppBar(
         title: Text('Calendario de Eventos'),
       ),
-      body: SfCalendar(
-        view: CalendarView.month, // Vista de mes
-        allowedViews: [
-          CalendarView.month,
-          CalendarView.week,
-          CalendarView.day,
-          CalendarView.schedule,
+      body: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16.0),
+            color: Colors.white,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Simbología:',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Container(width: 16, height: 16, color: Colors.orange),
+                          SizedBox(width: 8),
+                          Text('Estudiantes'),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Container(width: 16, height: 16, color: Colors.red),
+                          SizedBox(width: 8),
+                          Text('Profesores'),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Container(width: 16, height: 16, color: Colors.green),
+                          SizedBox(width: 8),
+                          Text('Jefes de Carrera'),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Container(width: 16, height: 16, color: Colors.blue),
+                          SizedBox(width: 8),
+                          Text('Ceremonias'),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Container(width: 16, height: 16, color: Colors.purple),
+                          SizedBox(width: 8),
+                          Text('Comunidad'),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Container(width: 16, height: 16, color: Colors.grey),
+                          SizedBox(width: 8),
+                          Text('Otros'),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: SfCalendar(
+              view: CalendarView.month, // Vista de mes
+              allowedViews: [
+                CalendarView.month,
+                CalendarView.week,
+                CalendarView.day,
+                CalendarView.schedule,
+              ],
+              dataSource: MeetingDataSource(meetings),
+              monthViewSettings: MonthViewSettings(
+                showAgenda: true, // Mostrar agenda de eventos debajo del calendario.
+                agendaItemHeight: 50,
+              ),
+              onTap: (CalendarTapDetails details) {
+                if (details.targetElement == CalendarElement.appointment) {
+                  if (details.appointments != null && details.appointments!.isNotEmpty) {
+                    final Meeting meeting = details.appointments!.first;
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text(meeting.eventName),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              RichText(
+                                text: TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: "Desde: ",
+                                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black), // En negrita y color negro
+                                    ),
+                                    TextSpan(
+                                      text: formatDateTime(meeting.from),
+                                      style: TextStyle(color: Colors.black), // Estilo normal y color negro
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              RichText(
+                                text: TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: "Hasta: ",
+                                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black), // En negrita y color negro
+                                    ),
+                                    TextSpan(
+                                      text: formatDateTime(meeting.to),
+                                      style: TextStyle(color: Colors.black), // Estilo normal y color negro
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              Text(""),
+                              RichText(
+                                text: TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: "Descripción: ",
+                                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black), // En negrita y color negro
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              Text("${meeting.eventName}", textAlign: TextAlign.justify,),
+                            ],
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text('Cerrar'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  }
+                }
+              },
+              onViewChanged: (ViewChangedDetails details) {
+                print("Vista actual cambiada: ${details.visibleDates}");
+              },
+            ),
+          ),
         ],
-        dataSource: MeetingDataSource(meetings),
-        monthViewSettings: MonthViewSettings(
-          showAgenda: true, // Mostrar agenda de eventos debajo del calendario.
-        ),
-        onViewChanged: (ViewChangedDetails details) {
-          print("Vista actual cambiada: ${details.visibleDates}");
-        },
       ),
     );
   }
+
 }
