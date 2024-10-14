@@ -76,8 +76,40 @@ class Subsystem {
   final String details;
   final List<String> procedures;
   final List<double> ratings;
+  double _averageRating;
 
-  Subsystem({required this.id, required this.name, required this.url, required this.details, required this.procedures, required this.ratings});
+  Subsystem({
+    required this.id,
+    required this.name,
+    required this.url,
+    required this.details,
+    required this.procedures,
+    required this.ratings,
+    double? averageRating,
+  }) : _averageRating = averageRating ?? 0.0;
+
+  double get averageRating => _averageRating;
+
+  set averageRating(double value) {
+    _averageRating = value;
+  }
+
+  Future<void> fetchAndRecalculateAverageRating() async {
+    // Ajustar la colección y documento basado en el `id` de cada `Subsystem`
+    final snapshot = await FirebaseFirestore.instance
+      .collection('reseñas')
+      .doc(name.toString())
+      .collection('userRatings')
+      .get();
+
+    final newRatings = snapshot.docs.map((doc) => doc['valoración'] as double).toList();
+
+    if (newRatings.isNotEmpty) {
+      ratings.clear();
+      ratings.addAll(newRatings);
+      _averageRating = ratings.reduce((a, b) => a + b) / ratings.length;
+    }
+  }
 }
 
 class HomePage extends StatefulWidget {
@@ -237,20 +269,56 @@ class _HomePageState extends State<HomePage> {
       ],
       ratings: [],
     ),
-    // Otros subsistemas aquí...
   ];
   List<Subsystem> filteredSites = [];
+  double _averageRating = 0.0;
+  ValueNotifier<bool> _isTextPresent = ValueNotifier<bool>(false);
 
   @override
   void initState() {
     super.initState();
     filteredSites = allSites;
+    _calculateAverageRatings();
+    _sortSitesByName();  // Ordenar sitios alfabéticamente al iniciar
+
+    textEditingController.addListener(() {
+      _isTextPresent.value = textEditingController.text.isNotEmpty;
+    });
   }
 
   @override
   void dispose() {
     textEditingController.dispose();
     super.dispose();
+  }
+
+  Future<void> _calculateAverageRating(Subsystem site) async {
+    final snapshot = await FirebaseFirestore.instance
+        .collection('reseñas')
+        .doc(site.name)
+        .collection('userRatings')
+        .get();
+    if (snapshot.docs.isNotEmpty) {
+      final totalRatings = snapshot.docs.map((doc) => doc['valoración'] as double).reduce((a, b) => a + b);
+      if (mounted) {
+        setState(() {
+          _averageRating = totalRatings / snapshot.docs.length;
+          site.averageRating = _averageRating;  // Asigna el promedio de valoración al sitio
+        });
+      }
+    }
+  }
+
+  Future<void> _calculateAverageRatings() async {
+    for (var site in allSites) {
+      await _calculateAverageRating(site);
+    }
+  }
+
+  void _sortSitesByName() {
+    setState(() {
+      filteredSites.sort((a, b) => a.name.compareTo(b.name));
+    });
   }
 
   @override
@@ -268,40 +336,64 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(context, MaterialPageRoute(builder: (_) => CalendarPage()));
             },
           ),
+          IconButton(
+            icon: Icon(Icons.bar_chart),
+            onPressed: () async {
+              for (var site in allSites) {
+                await site.fetchAndRecalculateAverageRating();
+              }
+              setState(() {});
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => RankingsPage(sites: allSites),
+                ),
+              );
+            },
+          ),
         ],
       ),
       body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-            child: TextField(
-              controller: textEditingController,
-              onChanged: (text) {
-                setState(() {
-                  filteredSites = allSites.where((site) {
-                    final lowerCaseQuery = text.toLowerCase();
-                    final matchesName = site.name.toLowerCase().contains(lowerCaseQuery);
-                    final matchesProcedures = site.procedures.any((procedure) => procedure.toLowerCase().contains(lowerCaseQuery));
-                    return matchesName || matchesProcedures;
-                  }).toList();
-                });
-              },
-              decoration: InputDecoration(
-                hintText: 'Buscar sitios...',
-                hintStyle: GoogleFonts.openSans(
-                  fontSize: 17,
-                  color: Colors.grey,
-                ),
-                suffixIcon: IconButton(
-                  icon: Icon(Icons.clear),
-                  onPressed: () {
+            child: ValueListenableBuilder(
+              valueListenable: _isTextPresent,
+              builder: (context, isTextPresent, child) {
+                return TextField(
+                  controller: textEditingController,
+                  onChanged: (text) {
                     setState(() {
-                      filteredSites = allSites;
+                      filteredSites = allSites.where((site) {
+                        final lowerCaseQuery = text.toLowerCase();
+                        final matchesName = site.name.toLowerCase().contains(lowerCaseQuery);
+                        final matchesProcedures = site.procedures.any((procedure) => procedure.toLowerCase().contains(lowerCaseQuery));
+                        return matchesName || matchesProcedures;
+                      }).toList();
+                      _sortSitesByName();  // Ordenar cada vez que se filtra
                     });
-                    textEditingController.clear();
                   },
-                ),
-              ),
+                  decoration: InputDecoration(
+                    hintText: 'Buscar sitios...',
+                    hintStyle: GoogleFonts.openSans(
+                      fontSize: 17,
+                      color: Colors.grey,
+                    ),
+                    suffixIcon: isTextPresent
+                        ? IconButton(
+                            icon: Icon(Icons.clear),
+                            onPressed: () {
+                              setState(() {
+                                filteredSites = allSites;
+                                _sortSitesByName();  // Ordenar cuando se limpia el filtro
+                              });
+                              textEditingController.clear();
+                            },
+                          )
+                        : null,
+                  ),
+                );
+              },
             ),
           ),
           Expanded(
@@ -449,9 +541,6 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
         setState(() {
           _averageRating = totalRatings / snapshot.docs.length;
           _totalReviews = snapshot.docs.length;
-          print("print");
-          print(totalRatings);
-          print(snapshot.docs.length);
         });
       }
     }
@@ -653,5 +742,45 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
     if (!await launchUrl(Uri.parse(url))) {
       throw Exception('No se puede cargar la url: $url');
     }
+  }
+}
+
+class RankingsPage extends StatefulWidget {
+  final List<Subsystem> sites;
+
+  RankingsPage({required this.sites});
+
+  @override
+  _RankingsPageState createState() => _RankingsPageState();
+}
+
+class _RankingsPageState extends State<RankingsPage> {
+  @override
+  Widget build(BuildContext context) {
+    // Ordena los sitios antes de construir la UI
+    List<Subsystem> sortedSites = List.from(widget.sites);
+    sortedSites.sort((a, b) => b.averageRating.compareTo(a.averageRating));
+
+    return Scaffold(
+      appBar: AppBar(title: Text('Rankings')),
+      body: ListView.builder(
+        itemCount: sortedSites.length,
+        itemBuilder: (context, index) {
+          final site = sortedSites[index];
+          return Card(
+            margin: EdgeInsets.all(10),
+            child: ListTile(
+              title: Text('${index + 1}. ${site.name}'),
+              subtitle: Text(
+                site.averageRating == 0
+                  ? 'Sin valoraciones'
+                  : 'Average Rating: ${site.averageRating.toStringAsFixed(2)}',
+              ),
+              trailing: Icon(Icons.star, color: Colors.amber),
+            ),
+          );
+        },
+      ),
+    );
   }
 }
