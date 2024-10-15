@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Esta es la importación necesaria
-import '../models/subsystem.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 import 'calendar_page.dart';
 import 'ranking_page.dart';
 import 'site_detail_page.dart';
-import 'package:google_fonts/google_fonts.dart';
+
+import '../models/subsystem.dart';
 import '../services/calculate_average_rating.dart';
-import '../services/auth_service.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -14,7 +14,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final AuthService _authService = AuthService();
   TextEditingController textEditingController = TextEditingController();
   List<Subsystem> allSites = [
     Subsystem(
@@ -25,7 +24,7 @@ class _HomePageState extends State<HomePage> {
       procedures: [
         'Revisar horario',
         'Inscribir ramos',
-        'Generar certificados de alumno regular',
+        'Generar certificado alumno regular',
         'Ver resumen académico',
         'Ver planes de carrera',
       ],
@@ -35,11 +34,14 @@ class _HomePageState extends State<HomePage> {
       id: 2,
       name: 'Aula',
       url: 'https://aula.usm.cl',
-      details: 'Accede a materiales de curso, foros y tareas.',
+      details: 'Sistema de gestión de aprendizaje.',
       procedures: [
         'Participar en foros',
+        'Responder foros',
         'Entregar tareas',
         'Ver calificaciones',
+        'Materiales de curso',
+        'Revisar tareas',
       ],
       ratings: [],
     ),
@@ -47,14 +49,13 @@ class _HomePageState extends State<HomePage> {
       id: 3,
       name: 'Autoservicio',
       url: 'https://autoservicio.usm.cl',
-      details: 'Accede a materiales de curso, foros y tareas.',
+      details: 'Portal de autoservicio institucional.',
       procedures: [
-        'Participar en foros',
-        'Entregar tareas',
-        'Ver calificaciones',
+        'Pagar en línea',
+        'Revisar estado de cuenta',
         'Pagos ayudantía',
-        'Pagar deudas'
-
+        'Pagar deudas',
+        'Cambiar cuenta bancaria',
       ],
       ratings: [],
     ),
@@ -62,11 +63,14 @@ class _HomePageState extends State<HomePage> {
       id: 4,
       name: 'Sireb',
       url: 'https://sireb.usm.cl',
-      details: 'A.',
+      details: 'Sistema de .',
       procedures: [
-        'A',
-        'A',
-        'A',
+        'Declaración de Antecedentes Socioeconómicos (DAS)',
+        'postulación a Becas USM',
+        'Renovación de Fondo Solidario Crédito Universitario',
+        'Reservar hora médico',
+        'Reservar hora kinesiólogo',
+        'Reservar hora asistente social',
       ],
       ratings: [],
     ),
@@ -74,11 +78,11 @@ class _HomePageState extends State<HomePage> {
       id: 5,
       name: 'Casino',
       url: 'https://casino.usm.cl',
-      details: 'A.',
+      details: 'Sistema de Casino de Alimentación USM.',
       procedures: [
-        'Ver alimentos',
-        'Ver almuerzos',
-        'A',
+        'Reserva de menú',
+        'Mis reservas',
+        'Mis consumos',
       ],
       ratings: [],
     ),
@@ -86,11 +90,11 @@ class _HomePageState extends State<HomePage> {
       id: 6,
       name: 'Gitlab DINF',
       url: 'https://gitlab.inf.utfsm.cl/',
-      details: 'A.',
+      details: 'sistema de control de versiones y seguimiento de cambios de un proyecto del departamento de informática.',
       procedures: [
-        'A',
-        'A',
-        'A',
+        'Gestionar versiones de proyectos',
+        'Subir proyectos a internet',
+        'Colaborar entre miembros de proyectos',
       ],
       ratings: [],
     ),
@@ -98,11 +102,11 @@ class _HomePageState extends State<HomePage> {
       id: 7,
       name: 'Gitlab Labcom',
       url: 'https://gitlab.labcomp.cl/',
-      details: 'A.',
+      details: 'sistema de control de versiones y seguimiento de cambios de un proyecto del laboratorio de computación.',
       procedures: [
-        'A',
-        'A',
-        'A',
+        'Gestionar versiones de proyectos',
+        'Subir proyectos a internet',
+        'Colaborar entre miembros de proyectos',
       ],
       ratings: [],
     ),
@@ -110,11 +114,11 @@ class _HomePageState extends State<HomePage> {
       id: 8,
       name: 'Asuntos Internacionales',
       url: 'https://oai.usm.cl/',
-      details: 'A.',
+      details: 'Sistema de la oficina de asuntos internacionales.',
       procedures: [
-        'A',
-        'A',
-        'A',
+        'Asuntos internacionales',
+        'Información de intercambio',
+        'Becas pasantía',
       ],
       ratings: [],
     ),
@@ -122,11 +126,9 @@ class _HomePageState extends State<HomePage> {
       id: 9,
       name: 'Minuta',
       url: 'https://vrea.usm.cl/minuta-alimentacion/',
-      details: '.',
+      details: 'Sistema que contiene las minutas de alimentación para los campus y sedes de la Universidad',
       procedures: [
-        'A',
-        'A',
-        'A',
+        'Revisar almuerzos',
       ],
       ratings: [],
     ),
@@ -134,11 +136,12 @@ class _HomePageState extends State<HomePage> {
       id: 10,
       name: 'Trabaja con nosotros',
       url: 'https://usm.hiringroom.com/jobs',
-      details: 'A.',
+      details: 'Plataforma donde se publican vacantes laborales y se pueden postular a empleos en la Universidad',
       procedures: [
-        'A',
-        'A',
-        'A',
+        'Publicación de vacantes laborales',
+        'Buscar empleos',
+        'Postular a empleos',
+        'Buscar trabajos',
       ],
       ratings: [],
     ),
@@ -148,9 +151,10 @@ class _HomePageState extends State<HomePage> {
       url: 'https://usmx.cl/',
       details: 'Plataforma de cursos abiertos en línea.',
       procedures: [
-        'A',
-        'A',
-        'A',
+        'Inscripción en cursos online.',
+        'Acceso a material educativo digital.',
+        'Solicitud de certificaciones al finalizar cursos.',
+        'Participación en programas de formación profesional.',
       ],
       ratings: [],
     ),
@@ -158,19 +162,52 @@ class _HomePageState extends State<HomePage> {
       id: 12,
       name: 'Directorio',
       url: 'https://www.directorio.usm.cl/',
-      details: 'A.',
+      details: 'Información respecto a funcionarios de la universidad.',
       procedures: [
-        'A',
-        'A',
-        'A',
+        'Buscar funcionario',
+        'Buscar número de profesores',
+        'Buscar autoridades',
       ],
       ratings: [],
     ),
-    // añade más sitios aquí...
+    Subsystem(
+      id: 13,
+      name: 'Validador de Documentos',
+      url: 'https://validaciondocumentos.usm.cl/',
+      details: 'Sistema de verificación de documentos emitidos por la Universidad.',
+      procedures: [
+        'Verificar certificados',
+        'Verificar documentos',
+        ],
+      ratings: [],
+    ),
+    Subsystem(
+      id: 14,
+      name: 'Biblioteca Digital',
+      url: 'https://bibliotecadigital.usm.cl/',
+      details: 'Plataforma de la Universidad que ofrece acceso a recursos académicos en línea, como libros, artículos, y tesis, para estudiantes y profesores.',
+      procedures: [
+        'Acceso a libros y artículos en formato digital.',
+        'Descarga de tesis y publicaciones académicas.',
+        'Búsqueda y consulta de recursos especializados.',
+        'Préstamo de libros electrónicos.',
+        ],
+      ratings: [],
+    ),
+    // Subsystem(
+    //   id: ,
+    //   name: '',
+    //   url: '',
+    //   details: '',
+    //   procedures: [
+    //     '',
+    //     '',
+    //     ],
+    //   ratings: [],
+    // ),
   ];
   List<Subsystem> filteredSites = [];
   ValueNotifier<bool> _isTextPresent = ValueNotifier<bool>(false);
-  bool _isLoggedIn = false;
 
   @override
   void initState() {
@@ -181,7 +218,6 @@ class _HomePageState extends State<HomePage> {
     textEditingController.addListener(() {
       _isTextPresent.value = textEditingController.text.isNotEmpty;
     });
-    _checkAuthentication();
   }
 
   @override
@@ -203,14 +239,6 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void _checkAuthentication() {
-    _authService.authStateChanges.listen((User? user) {
-      setState(() {
-        _isLoggedIn = user != null;
-      });
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -226,22 +254,21 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(context, MaterialPageRoute(builder: (_) => CalendarPage()));
             },
           ),
-          if (_isLoggedIn) // Solo mostrar si el usuario está logeado
-            IconButton(
-              icon: Icon(Icons.bar_chart),
-              onPressed: () async {
-                for (var site in allSites) {
-                  await site.fetchAndRecalculateAverageRating();
-                }
-                setState(() {});
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => RankingsPage(sites: allSites),
-                  ),
-                );
-              },
-            ),
+          IconButton(
+            icon: Icon(Icons.bar_chart),
+            onPressed: () async {
+              for (var site in allSites) {
+                await site.fetchAndRecalculateAverageRating();
+              }
+              setState(() {});
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => RankingsPage(sites: allSites),
+                ),
+              );
+            },
+          ),
         ],
       ),
       body: Column(
@@ -265,7 +292,7 @@ class _HomePageState extends State<HomePage> {
                     });
                   },
                   decoration: InputDecoration(
-                    hintText: 'Buscar sitios...',
+                    hintText: 'Buscar sitios, servicios o trámites...',
                     hintStyle: GoogleFonts.openSans(
                       fontSize: 17,
                       color: Colors.grey,

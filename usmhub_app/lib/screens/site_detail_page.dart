@@ -4,7 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import '../models/subsystem.dart'; // Suponiendo que hayas movido `Subsystem` a un archivo separado llamado subsystem.dart
+
+import '../models/subsystem.dart';
 import '../services/auth_service.dart';
 
 class SiteDetailPage extends StatefulWidget {
@@ -211,6 +212,12 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
                   '• $procedure',
                   style: TextStyle(fontSize: 18),
                 )).toList(),
+            Center(
+              child: ElevatedButton(
+                onPressed: () => _launchURL(widget.site.url),
+                child: Text('IR AL SITIO'),
+              ),
+            ),
             SizedBox(height: 20),
             Text(
               'Calificar este sitio:',
@@ -274,17 +281,21 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
                       });
                     });
                   },
-                  child: Text('Inicia sesión con Google para calificar'),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Image.asset(
+                        'assets/images/logo_google.png',
+                        height: 24.0,
+                        width: 24.0,
+                      ),
+                      SizedBox(width: 10), // Espacio entre el icono y el texto
+                      Text('Continuar con Google'),
+                    ],
+                  ),
                 ),
               ),
-              SizedBox(height: 20),
             ],
-            Center(
-              child: ElevatedButton(
-                onPressed: () => _launchURL(widget.site.url),
-                child: Text('IR AL SITIO'),
-              ),
-            ),
           ],
         ),
       ),
