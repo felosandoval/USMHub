@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:icalendar_parser/icalendar_parser.dart';
-import 'package:http/http.dart' as http;
 import '../models/meeting.dart';
 import 'package:intl/intl.dart';
 
@@ -13,12 +13,15 @@ class CalendarPage extends StatefulWidget {
 class _CalendarPageState extends State<CalendarPage> {
   List<Meeting> meetings = [];
   List<Meeting> filteredMeetings = [];
-  final List<String> icsUrls = [
-    'https://vra.usm.cl/eventos/mes/2024-10/?ical=1',
-    'https://vra.usm.cl/eventos/mes/2024-11/?ical=1',
-    'https://vra.usm.cl/eventos/mes/2024-12/?ical=1',
-    'https://vra.usm.cl/eventos/mes/2025-01/?ical=1',
+
+  final List<String> icsFiles = [
+    // https://vra.usm.cl/eventos/mes/2025-01/?ical=1
+    'assets/calendars/2024-10.ics',
+    'assets/calendars/2024-11.ics',
+    'assets/calendars/2024-12.ics',
+    'assets/calendars/2025-01.ics',
   ];
+
   late CalendarController _calendarController;
 
   @override
@@ -30,50 +33,39 @@ class _CalendarPageState extends State<CalendarPage> {
 
   Future<void> _loadIcsFiles() async {
     List<Meeting> loadedMeetings = [];
-    List<Future<http.Response>> futures = [];
-
-    // Crear una lista de futuros para todas las solicitudes HTTP
-    for (String icsUrl in icsUrls) {
-      futures.add(http.get(Uri.parse(icsUrl)));
-    }
-
-    // Esperar a que todas las solicitudes HTTP terminen
-    List<http.Response> responses = await Future.wait(futures);
-
-    for (var response in responses) {
-      if (response.statusCode == 200) {
-        final icalendar = ICalendar.fromString(response.body);
-        final events = icalendar.data.where((component) => component['type'] == 'VEVENT');
-        for (var event in events) {
-          final startDate = event['dtstart']?.dt;
-          final endDate = event['dtend']?.dt;
-          final summary = event['summary'] ?? 'Sin título';
-          String category = 'Default';
-          if (event['categories'] != null) {
-            var categories = event['categories'];
-            if (categories is List) {
-              category = categories.join(', '); // Guardar todas las categorías
-            } else if (categories is String) {
-              category = categories;
-            }
+    for (String icsFile in icsFiles) {
+      final icsString = await rootBundle.loadString(icsFile);
+      final icalendar = ICalendar.fromString(icsString);
+      final events = icalendar.data.where((component) => component['type'] == 'VEVENT');
+      for (var event in events) {
+        final startDate = event['dtstart']?.dt;
+        final endDate = event['dtend']?.dt;
+        final summary = event['summary'] ?? 'Sin título';
+        String category = 'Default';
+        if (event['categories'] != null) {
+          var categories = event['categories'];
+          if (categories is List) {
+            category = categories.join(', '); // Guardar todas las categorías
+          } else if (categories is String) {
+            category = categories;
           }
-          if (startDate != null) {
-            DateTime eventStartDate = DateTime.parse(startDate.toString());
-            DateTime eventEndDate = (endDate != null)
-                ? DateTime.parse(endDate.toString()).subtract(Duration(days: 1))
-                : eventStartDate;
-            Color eventColor = _getColorForCategory(category.split(',')[0]); // Usar la primera categoría para el color
-            loadedMeetings.add(Meeting(summary, eventStartDate, eventEndDate, eventColor, false, category));
-          }
+        }
+        if (startDate != null) {
+          DateTime eventStartDate = DateTime.parse(startDate.toString());
+          DateTime eventEndDate = (endDate != null)
+              ? DateTime.parse(endDate.toString()).subtract(Duration(days: 1))
+              : eventStartDate;
+          Color eventColor = _getColorForCategory(category.split(',')[0]); // Usar la primera categoría para el color
+          loadedMeetings.add(Meeting(summary, eventStartDate, eventEndDate, eventColor, false, category));
         }
       }
     }
-
     setState(() {
       meetings = loadedMeetings;
       filteredMeetings = meetings; // Inicialmente, mostrar todos los eventos
     });
   }
+
 
   Color _getColorForCategory(String category) {
     switch (category.toLowerCase()) {
