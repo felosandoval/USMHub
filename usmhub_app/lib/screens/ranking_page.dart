@@ -18,7 +18,7 @@ class _RankingsPageState extends State<RankingsPage> {
     sortedSites.sort((a, b) => b.averageRating.compareTo(a.averageRating));
 
     return Scaffold(
-      appBar: AppBar(title: Text('Rankings')),
+      appBar: AppBar(title: Text('Ranking')),
       body: ListView.builder(
         itemCount: sortedSites.length,
         itemBuilder: (context, index) {

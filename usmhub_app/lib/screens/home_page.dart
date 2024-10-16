@@ -248,18 +248,19 @@ class _HomePageState extends State<HomePage> {
           style: GoogleFonts.roboto(fontSize: 25),
         ),
         actions: [
+          // BOTÓN DE CALENDARIO
           IconButton(
             icon: Icon(Icons.calendar_today),
             onPressed: () {
               Navigator.push(context, MaterialPageRoute(builder: (_) => CalendarPage()));
             },
           ),
+          // BOTÓN DE RANKING
           IconButton(
             icon: Icon(Icons.bar_chart),
             onPressed: () async {
-              for (var site in allSites) {
-                await site.fetchAndRecalculateAverageRating();
-              }
+              await Future.wait(allSites.map((site) => site.fetchAndRecalculateAverageRating()));
+
               setState(() {});
               Navigator.push(
                 context,

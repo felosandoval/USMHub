@@ -43,7 +43,7 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
       try {
         final doc = await _retryOnException(() async {
           return await FirebaseFirestore.instance
-              .collection('reseñas')
+              .collection('ratings')
               .doc(widget.site.name)
               .collection('userRatings')
               .doc(user.email)
@@ -62,8 +62,6 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
       } catch (e) {
         print('Error al obtener el rating del usuario: $e');
       }
-    } else {
-      print('El usuario no ha iniciado sesión.');
     }
   }
 
@@ -83,7 +81,7 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
 
   Future<int> _getTotalReviews() async {
     final snapshot = await FirebaseFirestore.instance
-        .collection('reseñas')
+        .collection('ratings')
         .doc(widget.site.name)
         .collection('userRatings')
         .get();
@@ -92,7 +90,7 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
 
   void _calculateAverageRating() async {
     final snapshot = await FirebaseFirestore.instance
-        .collection('reseñas')
+        .collection('ratings')
         .doc(widget.site.name)
         .collection('userRatings')
         .get();
@@ -111,14 +109,12 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser != null) {
       await FirebaseFirestore.instance
-          .collection('reseñas')
+          .collection('ratings')
           .doc(widget.site.name)
           .collection('userRatings')
           .doc(currentUser.email)
           .set({'valoración': rating});
       _calculateAverageRating();
-    } else {
-      print('El usuario no ha iniciado sesión.');
     }
   }
 
@@ -170,12 +166,7 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
                       FutureBuilder<int>(
                         future: _getTotalReviews(),
                         builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return Text(
-                              '(cargando reseñas)',
-                              style: TextStyle(fontSize: 16, color: Colors.grey),
-                            );
-                          } else if (snapshot.hasError) {
+                          if (snapshot.hasError) {
                             return Text(
                               '($_totalReviews reseñas)', // Mostrar el total de reseñas que tenemos
                               style: TextStyle(fontSize: 16, color: Colors.grey),
