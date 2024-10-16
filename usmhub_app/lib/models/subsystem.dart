@@ -30,7 +30,7 @@ class Subsystem {
     // Ajustar la colección y documento basado en el `nombre` de cada `Subsystem`
     final snapshot = await FirebaseFirestore.instance
         .collection('ratings')
-        .doc(name.toString())
+        .doc(id.toString())
         .collection('userRatings')
         .get();
     final newRatings = snapshot.docs.map((doc) => doc['valoración'] as double).toList();
