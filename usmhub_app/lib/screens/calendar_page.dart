@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:icalendar_parser/icalendar_parser.dart';
+import 'package:http/http.dart' as http;
 import '../models/meeting.dart';
 import 'package:intl/intl.dart';
 
@@ -12,12 +12,13 @@ class CalendarPage extends StatefulWidget {
 
 class _CalendarPageState extends State<CalendarPage> {
   List<Meeting> meetings = [];
-  final List<String> icsFiles = [
-    'assets/calendars/2024-10.ics',
-    'assets/calendars/2024-11.ics',
-    'assets/calendars/2024-12.ics',
+  List<Meeting> filteredMeetings = [];
+  final List<String> icsUrls = [
+    'https://vra.usm.cl/eventos/mes/2024-10/?ical=1',
+    'https://vra.usm.cl/eventos/mes/2024-11/?ical=1',
+    'https://vra.usm.cl/eventos/mes/2024-12/?ical=1',
+    'https://vra.usm.cl/eventos/mes/2025-01/?ical=1',
   ];
-  
   late CalendarController _calendarController;
 
   @override
@@ -29,57 +30,80 @@ class _CalendarPageState extends State<CalendarPage> {
 
   Future<void> _loadIcsFiles() async {
     List<Meeting> loadedMeetings = [];
-    for (String icsFile in icsFiles) {
-      final icsString = await rootBundle.loadString(icsFile);
-      final icalendar = ICalendar.fromString(icsString);
-      final events = icalendar.data.where((component) => component['type'] == 'VEVENT');
-      for (var event in events) {
-        final startDate = event['dtstart']?.dt;
-        final endDate = event['dtend']?.dt;
-        final summary = event['summary'] ?? 'Sin título';
-        String category = 'Default';
-        if (event['categories'] != null) {
-          var categories = event['categories'];
-          if (categories is List) {
-            category = categories[0];
-          } else if (categories is String) {
-            category = categories;
+    List<Future<http.Response>> futures = [];
+
+    // Crear una lista de futuros para todas las solicitudes HTTP
+    for (String icsUrl in icsUrls) {
+      futures.add(http.get(Uri.parse(icsUrl)));
+    }
+
+    // Esperar a que todas las solicitudes HTTP terminen
+    List<http.Response> responses = await Future.wait(futures);
+
+    for (var response in responses) {
+      if (response.statusCode == 200) {
+        final icalendar = ICalendar.fromString(response.body);
+        final events = icalendar.data.where((component) => component['type'] == 'VEVENT');
+        for (var event in events) {
+          final startDate = event['dtstart']?.dt;
+          final endDate = event['dtend']?.dt;
+          final summary = event['summary'] ?? 'Sin título';
+          String category = 'Default';
+          if (event['categories'] != null) {
+            var categories = event['categories'];
+            if (categories is List) {
+              category = categories.join(', '); // Guardar todas las categorías
+            } else if (categories is String) {
+              category = categories;
+            }
           }
-        }
-        if (startDate != null) {
-          DateTime eventStartDate = DateTime.parse(startDate.toString());
-          DateTime eventEndDate = (endDate != null)
-              ? DateTime.parse(endDate.toString()).subtract(Duration(days: 1))
-              : eventStartDate;
-          Color eventColor = _getColorForCategory(category);
-          loadedMeetings.add(Meeting(summary, eventStartDate, eventEndDate, eventColor, false));
+          if (startDate != null) {
+            DateTime eventStartDate = DateTime.parse(startDate.toString());
+            DateTime eventEndDate = (endDate != null)
+                ? DateTime.parse(endDate.toString()).subtract(Duration(days: 1))
+                : eventStartDate;
+            Color eventColor = _getColorForCategory(category.split(',')[0]); // Usar la primera categoría para el color
+            loadedMeetings.add(Meeting(summary, eventStartDate, eventEndDate, eventColor, false, category));
+          }
         }
       }
     }
+
     setState(() {
       meetings = loadedMeetings;
+      filteredMeetings = meetings; // Inicialmente, mostrar todos los eventos
     });
   }
 
   Color _getColorForCategory(String category) {
-    switch (category.toLowerCase()) { 
-      case 'estudiantes': 
-        return Color(0xFFCA9E00); 
-      case 'profesores': 
-        return Color(0xFFD2091D); 
-      case 'jefes de carrera': 
-        return Color(0xFF007549); 
-      case 'ceremonias': 
-        return Color(0xFF005E90); 
-      case 'comunidad usm': 
-        return Color(0xFF0D0E0D); 
-      default: 
-        return Colors.grey.shade200; 
-    } 
+    switch (category.toLowerCase()) {
+      case 'estudiantes':
+        return Color(0xFFCA9E00);
+      case 'profesores':
+        return Color(0xFFD2091D);
+      case 'jefes de carrera':
+        return Color(0xFF007549);
+      case 'ceremonias':
+        return Color(0xFF005E90);
+      case 'comunidad usm':
+        return Color(0xFF0D0E0D);
+      default:
+        return Colors.grey.shade200;
+    }
   }
 
   String formatDateTime(DateTime dateTime) {
     return DateFormat('yyyy-MM-dd HH:mm').format(dateTime);
+  }
+
+  void filterEvents(String categories) {
+    List<String> categoryList = categories.toLowerCase().split(',').map((category) => category.trim()).toList();
+    setState(() {
+      filteredMeetings = meetings.where((event) {
+        List<String> eventCategories = event.category.toLowerCase().split(',').map((category) => category.trim()).toList();
+        return categoryList.any((category) => eventCategories.contains(category));
+      }).toList();
+    });
   }
 
   @override
@@ -113,111 +137,146 @@ class _CalendarPageState extends State<CalendarPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Simbología:',
+                  'Filtros:',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 10),
                 Row(
                   children: [
                     Expanded(
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 16,
-                            height: 16,
-                            decoration: BoxDecoration(
-                              color: Color(0xFFCA9E00),
-                              borderRadius: BorderRadius.circular(5),
+                      child: GestureDetector(
+                        onTap: () {
+                          filterEvents('Estudiantes, Profesores, Ceremonias, Comunidad USM, Jefes de Carrera');
+                        },
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 16,
+                              height: 16,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade300,
+                                borderRadius: BorderRadius.circular(5),
+                              ),
                             ),
-                          ),
-                          SizedBox(width: 8),
-                          Text('Estudiantes'),
-                        ],
+                            SizedBox(width: 8),
+                            Text('Todos'),
+                          ],
+                        ),
                       ),
                     ),
+
                     Expanded(
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 16,
-                            height: 16,
-                            decoration: BoxDecoration(
-                              color: Color(0xFFD2091D),
-                              borderRadius: BorderRadius.circular(5),
+                      child: GestureDetector(
+                        onTap: () {
+                          filterEvents('estudiantes');
+                        },
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 16,
+                              height: 16,
+                              decoration: BoxDecoration(
+                                color: Color.fromARGB(255, 202, 158, 0),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
                             ),
-                          ),
-                          SizedBox(width: 8),
-                          Text('Profesores'),
-                        ],
+                            SizedBox(width: 8),
+                            Text('Estudiantes'),
+                          ],
+                        ),
                       ),
                     ),
+
                     Expanded(
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 16,
-                            height: 16,
-                            decoration: BoxDecoration(
-                              color: Color(0xFF007549),
-                              borderRadius: BorderRadius.circular(5),
+                      child: GestureDetector(
+                        onTap: () {
+                          filterEvents('profesores');
+                        },
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 16,
+                              height: 16,
+                              decoration: BoxDecoration(
+                                color: Color.fromARGB(255, 210, 9, 29),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
                             ),
-                          ),
-                          SizedBox(width: 8),
-                          Text('Jefes de Carrera'),
-                        ],
+                            SizedBox(width: 8),
+                            Text('Profesores'),
+                          ],
+                        ),
                       ),
                     ),
                   ],
                 ),
+
                 SizedBox(height: 10),
+                
                 Row(
                   children: [
                     Expanded(
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 16,
-                            height: 16,
-                            decoration: BoxDecoration(
-                              color: Color(0xFF005E90),
-                              borderRadius: BorderRadius.circular(5),
+                      child: GestureDetector(
+                        onTap: () {
+                          filterEvents('Ceremonias');
+                        },
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 16,
+                              height: 16,
+                              decoration: BoxDecoration(
+                                color: Color.fromARGB(255, 0, 94, 144),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
                             ),
-                          ),
-                          SizedBox(width: 8),
-                          Text('Ceremonias'),
-                        ],
+                            SizedBox(width: 8),
+                            Text('Ceremonias'),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          filterEvents('Comunidad USM');
+                        },
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 16,
+                              height: 16,
+                              decoration: BoxDecoration(
+                                color: Color.fromARGB(255, 13, 14, 13),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            Text('Comunidad'),
+                          ],
+                        ),
                       ),
                     ),
                     Expanded(
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 16,
-                            height: 16,
-                            decoration: BoxDecoration(
-                              color: Color(0xFF0D0E0D),
-                              borderRadius: BorderRadius.circular(5),
+                      child: GestureDetector(
+                        onTap: () {
+                          filterEvents('Jefes de Carrera');
+                        },
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 16,
+                              height: 16,
+                              decoration: BoxDecoration(
+                                color: Color.fromARGB(255, 0, 117, 72),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
                             ),
-                          ),
-                          SizedBox(width: 8),
-                          Text('Comunidad'),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 16,
-                            height: 16,
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade200,
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                          ),
-                          SizedBox(width: 8),
-                          Text('Otros'),
-                        ],
+                            SizedBox(width: 8),
+                            Text('Jefes de Carrera'),
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -230,13 +289,19 @@ class _CalendarPageState extends State<CalendarPage> {
               controller: _calendarController,
               view: CalendarView.month,
               allowedViews: [
+                //CalendarView.day,
                 CalendarView.month,
                 CalendarView.schedule,
+                //CalendarView.timelineDay,
+                CalendarView.timelineMonth,
+                //CalendarView.timelineWeek,
+                //CalendarView.week,
+                //CalendarView.workWeek,
               ],
-              dataSource: MeetingDataSource(meetings),
+              dataSource: MeetingDataSource(filteredMeetings),
               monthViewSettings: MonthViewSettings(
                 showAgenda: true,
-                agendaItemHeight: 50,
+                agendaItemHeight: 60,
               ),
               onTap: (CalendarTapDetails details) {
                 if (details.targetElement == CalendarElement.appointment) {
@@ -253,32 +318,20 @@ class _CalendarPageState extends State<CalendarPage> {
                             children: [
                               RichText(
                                 text: TextSpan(
-                                  children: [
-                                    TextSpan(
-                                      text: "Desde: ",
-                                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-                                    ),
-                                    TextSpan(
-                                      text: formatDateTime(meeting.from),
-                                      style: TextStyle(color: Colors.black),
-                                    ),
-                                  ],
+                                  text: formatDateTime(meeting.from) + ' - ' + formatDateTime(meeting.to),
+                                  style: TextStyle(color: Colors.black),
                                 ),
                               ),
-                              RichText(
-                                text: TextSpan(
-                                  children: [
-                                    TextSpan(
-                                      text: "Hasta: ",
-                                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-                                    ),
-                                    TextSpan(
-                                      text: formatDateTime(meeting.to),
-                                      style: TextStyle(color: Colors.black),
-                                    ),
-                                  ],
-                                ),
+                              SizedBox(height: 8),
+                              Text(
+                                'Categorías:',
+                                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
                               ),
+                              for (var category in meeting.category.split(','))
+                                Text(
+                                  '* ${category.trim()}',
+                                  style: TextStyle(color: Colors.black),
+                                ),
                             ],
                           ),
                           actions: [
@@ -295,10 +348,11 @@ class _CalendarPageState extends State<CalendarPage> {
                   }
                 }
               },
-              onViewChanged: (ViewChangedDetails details) {
+onViewChanged: (ViewChangedDetails details) {
                 print("Vista actual cambiada: ${details.visibleDates}");
               },
-            ),
+            )
+
           ),
         ],
       ),
