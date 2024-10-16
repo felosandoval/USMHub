@@ -4,7 +4,7 @@ import '../models/subsystem.dart'; // Asegúrate de que la ruta a Subsystem sea 
 Future<void> _calculateAverageRating(Subsystem site) async {
   final snapshot = await FirebaseFirestore.instance
       .collection('ratings')
-      .doc(site.name)
+      .doc(site.id.toString())
       .collection('userRatings')
       .get();
   if (snapshot.docs.isNotEmpty) {

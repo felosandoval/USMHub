@@ -29,6 +29,7 @@ class _HomePageState extends State<HomePage> {
         'Ver planes de carrera',
       ],
       ratings: [],
+      image: "assets/images/01.jpg",
     ),
     Subsystem(
       id: 2,
@@ -44,6 +45,7 @@ class _HomePageState extends State<HomePage> {
         'Revisar tareas',
       ],
       ratings: [],
+      image: "assets/images/02.jpg",
     ),
     Subsystem(
       id: 3,
@@ -58,6 +60,7 @@ class _HomePageState extends State<HomePage> {
         'Cambiar cuenta bancaria',
       ],
       ratings: [],
+      image: "assets/images/03.png",
     ),
     Subsystem(
       id: 4,
@@ -73,6 +76,7 @@ class _HomePageState extends State<HomePage> {
         'Reservar hora asistente social',
       ],
       ratings: [],
+      image: "assets/images/04.jpg",
     ),
     Subsystem(
       id: 5,
@@ -85,6 +89,7 @@ class _HomePageState extends State<HomePage> {
         'Mis consumos',
       ],
       ratings: [],
+      image: "assets/images/05.jpg",
     ),
     Subsystem(
       id: 6,
@@ -97,6 +102,7 @@ class _HomePageState extends State<HomePage> {
         'Colaborar entre miembros de proyectos',
       ],
       ratings: [],
+      image: "assets/images/06.jpg",
     ),
     Subsystem(
       id: 7,
@@ -109,6 +115,7 @@ class _HomePageState extends State<HomePage> {
         'Colaborar entre miembros de proyectos',
       ],
       ratings: [],
+      image: "assets/images/07.png",
     ),
     Subsystem(
       id: 8,
@@ -121,6 +128,7 @@ class _HomePageState extends State<HomePage> {
         'Becas pasantía',
       ],
       ratings: [],
+      image: "assets/images/08.png",
     ),
     Subsystem(
       id: 9,
@@ -131,6 +139,7 @@ class _HomePageState extends State<HomePage> {
         'Revisar almuerzos',
       ],
       ratings: [],
+      image: "assets/images/09.jpg",
     ),
     Subsystem(
       id: 10,
@@ -144,6 +153,7 @@ class _HomePageState extends State<HomePage> {
         'Buscar trabajos',
       ],
       ratings: [],
+      image: "assets/images/10.jpg",
     ),
     Subsystem(
       id: 11,
@@ -157,6 +167,7 @@ class _HomePageState extends State<HomePage> {
         'Participación en programas de formación profesional.',
       ],
       ratings: [],
+      image: "assets/images/11.jpg",
     ),
     Subsystem(
       id: 12,
@@ -169,6 +180,7 @@ class _HomePageState extends State<HomePage> {
         'Buscar autoridades',
       ],
       ratings: [],
+      image: "assets/images/12.png",
     ),
     Subsystem(
       id: 13,
@@ -180,6 +192,7 @@ class _HomePageState extends State<HomePage> {
         'Verificar documentos',
         ],
       ratings: [],
+      image: "assets/images/13.jpeg",
     ),
     Subsystem(
       id: 14,
@@ -193,6 +206,7 @@ class _HomePageState extends State<HomePage> {
         'Préstamo de libros electrónicos.',
         ],
       ratings: [],
+      image: "assets/images/14.jpg",
     ),
     // Subsystem(
     //   id: ,
@@ -275,43 +289,55 @@ class _HomePageState extends State<HomePage> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
             child: ValueListenableBuilder(
               valueListenable: _isTextPresent,
               builder: (context, isTextPresent, child) {
-                return TextField(
-                  controller: textEditingController,
-                  onChanged: (text) {
-                    setState(() {
-                      filteredSites = allSites.where((site) {
-                        final lowerCaseQuery = text.toLowerCase();
-                        final matchesName = site.name.toLowerCase().contains(lowerCaseQuery);
-                        final matchesProcedures = site.procedures.any((procedure) => procedure.toLowerCase().contains(lowerCaseQuery));
-                        return matchesName || matchesProcedures;
-                      }).toList();
-                      _sortSitesByName();  // Ordenar cada vez que se filtra
-                    });
-                  },
-                  decoration: InputDecoration(
-                    hintText: 'Buscar sitios, servicios o trámites...',
-                    hintStyle: GoogleFonts.openSans(
-                      fontSize: 17,
-                      color: Colors.grey,
+                return Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30.0),
+                    border: Border.all(color: Colors.grey.shade200),
+                    color: Colors.grey.shade200
+                  ),
+                  child: TextField(
+                    controller: textEditingController,
+                    onChanged: (text) {
+                      setState(() {
+                        filteredSites = allSites.where((site) {
+                          final lowerCaseQuery = text.toLowerCase();
+                          final matchesName = site.name.toLowerCase().contains(lowerCaseQuery);
+                          final matchesProcedures = site.procedures.any((procedure) => procedure.toLowerCase().contains(lowerCaseQuery));
+                          return matchesName || matchesProcedures;
+                        }).toList();
+                        _sortSitesByName();  // Ordenar cada vez que se filtra
+                      });
+                    },
+                    decoration: InputDecoration(
+                      hintText: 'Buscar sitios, servicios o trámites...',
+                      hintStyle: GoogleFonts.openSans(
+                        fontSize: 17,
+                        color: Colors.grey,
+                      ),
+                      prefixIcon: Icon(Icons.search), // Añadir ícono de lupa
+                      suffixIcon: isTextPresent
+                          ? IconButton(
+                              icon: Icon(Icons.clear),
+                              onPressed: () {
+                                setState(() {
+                                  filteredSites = allSites;
+                                  _sortSitesByName();  // Ordenar cuando se limpia el filtro
+                                });
+                                textEditingController.clear();
+                              },
+                            )
+                          : null,
+                      border: InputBorder.none, // Sin bordes adicionales para el TextField
+                      contentPadding: EdgeInsets.symmetric(vertical: 15), // Centrar verticalmente
                     ),
-                    suffixIcon: isTextPresent
-                        ? IconButton(
-                            icon: Icon(Icons.clear),
-                            onPressed: () {
-                              setState(() {
-                                filteredSites = allSites;
-                                _sortSitesByName();  // Ordenar cuando se limpia el filtro
-                              });
-                              textEditingController.clear();
-                            },
-                          )
-                        : null,
+                    style: TextStyle(height: 1.5), // Centrar el texto
                   ),
                 );
+
               },
             ),
           ),
@@ -327,10 +353,10 @@ class _HomePageState extends State<HomePage> {
                 itemCount: filteredSites.length,
                 itemBuilder: (context, index) {
                   return Card(
-                    color: Color.fromARGB(199, 0, 75, 133),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15.0),
                     ),
+                    clipBehavior: Clip.antiAlias, // Esto permite que el contenido se recorte en los bordes redondeados
                     child: InkWell(
                       onTap: () {
                         Navigator.push(
@@ -340,18 +366,46 @@ class _HomePageState extends State<HomePage> {
                           ),
                         );
                       },
-                      child: Center(
-                        child: Text(
-                          filteredSites[index].name,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
+                      child: Stack(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                image: AssetImage(filteredSites[index].image),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
                           ),
-                        ),
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [Colors.transparent, Colors.black87],
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            bottom: 20,
+                            left: 20,
+                            right: 0,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                filteredSites[index].name,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   );
+
                 },
               ),
             ),

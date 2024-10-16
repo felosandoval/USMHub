@@ -44,7 +44,7 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
         final doc = await _retryOnException(() async {
           return await FirebaseFirestore.instance
               .collection('ratings')
-              .doc(widget.site.name)
+              .doc(widget.site.id.toString())
               .collection('userRatings')
               .doc(user.email)
               .get();
@@ -82,7 +82,7 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
   Future<int> _getTotalReviews() async {
     final snapshot = await FirebaseFirestore.instance
         .collection('ratings')
-        .doc(widget.site.name)
+        .doc(widget.site.id.toString())
         .collection('userRatings')
         .get();
     return snapshot.docs.length;
@@ -91,7 +91,7 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
   void _calculateAverageRating() async {
     final snapshot = await FirebaseFirestore.instance
         .collection('ratings')
-        .doc(widget.site.name)
+        .doc(widget.site.id.toString())
         .collection('userRatings')
         .get();
     if (snapshot.docs.isNotEmpty) {
@@ -110,7 +110,7 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
     if (currentUser != null) {
       await FirebaseFirestore.instance
           .collection('ratings')
-          .doc(widget.site.name)
+          .doc(widget.site.id.toString())
           .collection('userRatings')
           .doc(currentUser.email)
           .set({'valoración': rating});

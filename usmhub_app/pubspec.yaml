@@ -39,4 +39,4 @@ flutter:
   uses-material-design: true
   assets:
     - assets/calendars/
-    - assets/images/logo_google.png
+    - assets/images/
