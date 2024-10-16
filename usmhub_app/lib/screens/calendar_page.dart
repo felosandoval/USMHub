@@ -62,20 +62,20 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   Color _getColorForCategory(String category) {
-    switch (category.toLowerCase()) {
-      case 'estudiantes':
-        return Colors.orange;
-      case 'profesores':
-        return Colors.red;
-      case 'jefes de carrera':
-        return Colors.green;
-      case 'ceremonias':
-        return Colors.blue;
-      case 'comunidad usm':
-        return Colors.purple;
-      default:
-        return Colors.grey;
-    }
+    switch (category.toLowerCase()) { 
+      case 'estudiantes': 
+        return Color(0xFFCA9E00); 
+      case 'profesores': 
+        return Color(0xFFD2091D); 
+      case 'jefes de carrera': 
+        return Color(0xFF007549); 
+      case 'ceremonias': 
+        return Color(0xFF005E90); 
+      case 'comunidad usm': 
+        return Color(0xFF0D0E0D); 
+      default: 
+        return Colors.grey.shade200; 
+    } 
   }
 
   String formatDateTime(DateTime dateTime) {
@@ -126,7 +126,7 @@ class _CalendarPageState extends State<CalendarPage> {
                             width: 16,
                             height: 16,
                             decoration: BoxDecoration(
-                              color: Colors.orange,
+                              color: Color(0xFFCA9E00),
                               borderRadius: BorderRadius.circular(5),
                             ),
                           ),
@@ -142,7 +142,7 @@ class _CalendarPageState extends State<CalendarPage> {
                             width: 16,
                             height: 16,
                             decoration: BoxDecoration(
-                              color: Colors.red,
+                              color: Color(0xFFD2091D),
                               borderRadius: BorderRadius.circular(5),
                             ),
                           ),
@@ -158,7 +158,7 @@ class _CalendarPageState extends State<CalendarPage> {
                             width: 16,
                             height: 16,
                             decoration: BoxDecoration(
-                              color: Colors.green,
+                              color: Color(0xFF007549),
                               borderRadius: BorderRadius.circular(5),
                             ),
                           ),
@@ -179,7 +179,7 @@ class _CalendarPageState extends State<CalendarPage> {
                             width: 16,
                             height: 16,
                             decoration: BoxDecoration(
-                              color: Colors.blue,
+                              color: Color(0xFF005E90),
                               borderRadius: BorderRadius.circular(5),
                             ),
                           ),
@@ -195,7 +195,7 @@ class _CalendarPageState extends State<CalendarPage> {
                             width: 16,
                             height: 16,
                             decoration: BoxDecoration(
-                              color: Colors.purple,
+                              color: Color(0xFF0D0E0D),
                               borderRadius: BorderRadius.circular(5),
                             ),
                           ),
@@ -211,7 +211,7 @@ class _CalendarPageState extends State<CalendarPage> {
                             width: 16,
                             height: 16,
                             decoration: BoxDecoration(
-                              color: Colors.grey,
+                              color: Colors.grey.shade200,
                               borderRadius: BorderRadius.circular(5),
                             ),
                           ),
