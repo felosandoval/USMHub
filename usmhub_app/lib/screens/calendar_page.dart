@@ -134,145 +134,133 @@ class _CalendarPageState extends State<CalendarPage> {
                 ),
                 SizedBox(height: 10),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
+                  Expanded(
+                      child: ElevatedButton(
+                      onPressed: () {
                           filterEvents('Estudiantes, Profesores, Ceremonias, Comunidad USM, Jefes de Carrera');
-                        },
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 16,
-                              height: 16,
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade300,
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                            ),
-                            SizedBox(width: 8),
-                            Text('Todos'),
-                          ],
-                        ),
+                      },
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.grey.shade300,
+                          foregroundColor: Colors.black,
+                          
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                       ),
-                    ),
-
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
+                      child: Container(
+                          constraints: BoxConstraints(minWidth: 150), // Ajustar el ancho mínimo
+                          alignment: Alignment.center,
+                          child: Text('Todos'),
+                      ),
+                      ),
+                  ),
+                  SizedBox(width: 8),
+                  Expanded(
+                      child: ElevatedButton(
+                      onPressed: () {
                           filterEvents('estudiantes');
-                        },
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 16,
-                              height: 16,
-                              decoration: BoxDecoration(
-                                color: Color.fromARGB(255, 202, 158, 0),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                            ),
-                            SizedBox(width: 8),
-                            Text('Estudiantes'),
-                          ],
-                        ),
+                      },
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Color.fromARGB(255, 202, 158, 0),
+                          foregroundColor: Colors.white, // Texto claro para fondo oscuro
+                          
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                       ),
-                    ),
-
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
+                      child: Container(
+                          constraints: BoxConstraints(minWidth: 150),
+                          alignment: Alignment.center,
+                          child: Text('Estudiantes'),
+                      ),
+                      ),
+                  ),
+                  SizedBox(width: 8),
+                  Expanded(
+                      child: ElevatedButton(
+                      onPressed: () {
                           filterEvents('profesores');
-                        },
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 16,
-                              height: 16,
-                              decoration: BoxDecoration(
-                                color: Color.fromARGB(255, 210, 9, 29),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                            ),
-                            SizedBox(width: 8),
-                            Text('Profesores'),
-                          ],
-                        ),
+                      },
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Color.fromARGB(255, 210, 9, 29),
+                          foregroundColor: Colors.white, // Texto claro para fondo oscuro
+                          
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                       ),
-                    ),
+                      child: Container(
+                          constraints: BoxConstraints(minWidth: 150),
+                          alignment: Alignment.center,
+                          child: Text('Profesores'),
+                      ),
+                      ),
+                  ),
                   ],
-                ),
-
-                SizedBox(height: 10),
-                
-                Row(
+              ),
+              
+              Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
+                  Expanded(
+                      child: ElevatedButton(
+                      onPressed: () {
                           filterEvents('Ceremonias');
-                        },
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 16,
-                              height: 16,
-                              decoration: BoxDecoration(
-                                color: Color.fromARGB(255, 0, 94, 144),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                            ),
-                            SizedBox(width: 8),
-                            Text('Ceremonias'),
-                          ],
-                        ),
+                      },
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Color.fromARGB(255, 0, 94, 144),
+                          foregroundColor: Colors.white, // Texto claro para fondo oscuro
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                       ),
-                    ),
-
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
+                      child: Container(
+                          constraints: BoxConstraints(minWidth: 150),
+                          alignment: Alignment.center,
+                          child: Text('Ceremonias'),
+                      ),
+                      ),
+                  ),
+                  SizedBox(width: 8),
+                  Expanded(
+                      child: ElevatedButton(
+                      onPressed: () {
                           filterEvents('Comunidad USM');
-                        },
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 16,
-                              height: 16,
-                              decoration: BoxDecoration(
-                                color: Color.fromARGB(255, 13, 14, 13),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                            ),
-                            SizedBox(width: 8),
-                            Text('Comunidad'),
-                          ],
-                        ),
+                      },
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Color.fromARGB(255, 13, 14, 13),
+                          foregroundColor: Colors.white, // Texto claro para fondo oscuro
+                          
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                       ),
-                    ),
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
+                      child: Container(
+                          constraints: BoxConstraints(minWidth: 150),
+                          alignment: Alignment.center,
+                          child: Text('Comunidad'),
+                      ),
+                      ),
+                  ),
+                  SizedBox(width: 8),
+                  Expanded(
+                      child: ElevatedButton(
+                      onPressed: () {
                           filterEvents('Jefes de Carrera');
-                        },
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 16,
-                              height: 16,
-                              decoration: BoxDecoration(
-                                color: Color.fromARGB(255, 0, 117, 72),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                            ),
-                            SizedBox(width: 8),
-                            Text('Jefes de Carrera'),
-                          ],
-                        ),
+                      },
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Color.fromARGB(255, 0, 117, 72),
+                          foregroundColor: Colors.white, // Texto claro para fondo oscuro
+                          
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                       ),
-                    ),
+                      child: Container(
+                          constraints: BoxConstraints(minWidth: 150),
+                          alignment: Alignment.center,
+                          child: Text('Jefes Carrera'),
+                      ),
+                      ),
+                  ),
                   ],
-                ),
+              ),
               ],
             ),
           ),
