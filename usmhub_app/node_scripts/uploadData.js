@@ -8,7 +8,7 @@ admin.initializeApp({
 
 const db = admin.firestore();
 
-const subsystems = JSON.parse(fs.readFileSync('subsystems.json', 'utf8'));
+const subsystems = JSON.parse(fs.readFileSync('subsystemsI.json', 'utf8'));
 
 subsystems.subsystems.forEach(async (subsystem) => {
   await db.collection('subsystems').doc(subsystem.id.toString()).set(subsystem);
