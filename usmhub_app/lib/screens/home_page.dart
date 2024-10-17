@@ -21,16 +21,16 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _loadSubsystemsFromFirestore();
+    _refreshSites(); // Initial data load
     textEditingController.addListener(() {
       _isTextPresent.value = textEditingController.text.isNotEmpty;
     });
   }
 
-  Future<void> _loadSubsystemsFromFirestore() async {
+  Future<void> _refreshSites() async {
     final snapshot = await FirebaseFirestore.instance.collection('subsystems').get();
     setState(() {
-      allSites = snapshot.docs.map((doc) => Subsystem.fromJson(doc.data())).toList();
+      allSites = snapshot.docs.map((doc) => Subsystem.fromJson(doc.data() as Map<String, dynamic>)).toList();
       filteredSites = allSites;
       _sortSitesByName();
       _initializeData();
@@ -97,9 +97,10 @@ class _HomePageState extends State<HomePage> {
               builder: (context, isTextPresent, child) {
                 return Container(
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(30.0),
-                      border: Border.all(color: Colors.grey.shade200),
-                      color: Colors.grey.shade200),
+                    borderRadius: BorderRadius.circular(30.0),
+                    border: Border.all(color: Colors.grey.shade200),
+                    color: Colors.grey.shade200,
+                  ),
                   child: TextField(
                     controller: textEditingController,
                     onChanged: (text) {
@@ -122,16 +123,16 @@ class _HomePageState extends State<HomePage> {
                       ),
                       prefixIcon: Icon(Icons.search), // Añadir ícono de lupa
                       suffixIcon: isTextPresent
-                          ? IconButton(
-                              icon: Icon(Icons.clear),
-                              onPressed: () {
-                                setState(() {
-                                  filteredSites = allSites;
-                                  _sortSitesByName();  // Ordenar cuando se limpia el filtro
-                                });
-                                textEditingController.clear();
-                              },
-                            )
+                        ? IconButton(
+                            icon: Icon(Icons.clear),
+                            onPressed: () {
+                              setState(() {
+                                filteredSites = allSites;
+                                _sortSitesByName();  // Ordenar cuando se limpia el filtro
+                              });
+                              textEditingController.clear();
+                            },
+                          )
                           : null,
                       border: InputBorder.none, // Sin bordes adicionales para el TextField
                       contentPadding: EdgeInsets.symmetric(vertical: 15), // Centrar verticalmente
@@ -143,70 +144,73 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 10.0,
-                  mainAxisSpacing: 10.0,
-                ),
-                itemCount: filteredSites.length,
-                itemBuilder: (context, index) {
-                  return Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15.0),
-                    ),
-                    clipBehavior: Clip.antiAlias, // Esto permite que el contenido se recorte en los bordes redondeados
-                    child: InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => SiteDetailPage(site: filteredSites[index]),
-                          ),
-                        );
-                      },
-                      child: Stack(
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: AssetImage(filteredSites[index].image),
-                                fit: BoxFit.cover,
-                              ),
+            child: RefreshIndicator(
+              onRefresh: _refreshSites,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: GridView.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 10.0,
+                    mainAxisSpacing: 10.0,
+                  ),
+                  itemCount: filteredSites.length,
+                  itemBuilder: (context, index) {
+                    return Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                      ),
+                      clipBehavior: Clip.antiAlias, // Esto permite que el contenido se recorte en los bordes redondeados
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => SiteDetailPage(site: filteredSites[index]),
                             ),
-                          ),
-                          Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [Colors.transparent, Colors.black87],
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            bottom: 20,
-                            left: 20,
-                            right: 0,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                filteredSites[index].name,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
+                          );
+                        },
+                        child: Stack(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: AssetImage(filteredSites[index].image),
+                                  fit: BoxFit.cover,
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                            Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [Colors.transparent, Colors.black87],
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              bottom: 20,
+                              left: 20,
+                              right: 0,
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  filteredSites[index].name,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             ),
           ),
