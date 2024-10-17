@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter/services.dart' show rootBundle;
-import 'dart:convert';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'calendar_page.dart';
 import 'ranking_page.dart';
 import 'site_detail_page.dart';
@@ -23,19 +21,16 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _loadSubsystems();
+    _loadSubsystemsFromFirestore();
     textEditingController.addListener(() {
       _isTextPresent.value = textEditingController.text.isNotEmpty;
     });
   }
 
-  Future<void> _loadSubsystems() async {
-    final String response = await rootBundle.loadString('assets/subsystems.json');
-    final data = await json.decode(response);
+  Future<void> _loadSubsystemsFromFirestore() async {
+    final snapshot = await FirebaseFirestore.instance.collection('subsystems').get();
     setState(() {
-      allSites = (data['subsystems'] as List)
-          .map((i) => Subsystem.fromJson(i))
-          .toList();
+      allSites = snapshot.docs.map((doc) => Subsystem.fromJson(doc.data())).toList();
       filteredSites = allSites;
       _sortSitesByName();
       _initializeData();

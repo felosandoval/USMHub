@@ -204,21 +204,6 @@
         ],
         "ratings": [],
         "image": "assets/images/14.jpg"
-      },
-
-      {
-        "id": 15,
-        "name": "Biblioteca Digital",
-        "url": "https://bibliotecadigital.usm.cl/",
-        "details": "Plataforma de la Universidad que ofrece acceso a recursos académicos en línea, como libros, artículos, y tesis, para estudiantes y profesores.",
-        "procedures": [
-          "Acceso a libros y artículos en formato digital.",
-          "Descarga de tesis y publicaciones académicas.",
-          "Búsqueda y consulta de recursos especializados.",
-          "Préstamo de libros electrónicos."
-        ],
-        "ratings": [],
-        "image": "assets/images/14.jpg"
       }
     ]
   }
