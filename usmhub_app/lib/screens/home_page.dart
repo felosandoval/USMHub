@@ -175,7 +175,7 @@ class _HomePageState extends State<HomePage> {
                             Container(
                               decoration: BoxDecoration(
                                 image: DecorationImage(
-                                  image: AssetImage(filteredSites[index].image),
+                                  image: NetworkImage(filteredSites[index].image),
                                   fit: BoxFit.cover,
                                 ),
                               ),
