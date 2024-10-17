@@ -40,3 +40,4 @@ flutter:
   assets:
     - assets/calendars/
     - assets/images/
+    - assets/subsystems.json

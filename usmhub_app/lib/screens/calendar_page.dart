@@ -328,11 +328,7 @@ class _CalendarPageState extends State<CalendarPage> {
                   }
                 }
               },
-onViewChanged: (ViewChangedDetails details) {
-                print("Vista actual cambiada: ${details.visibleDates}");
-              },
             )
-
           ),
         ],
       ),

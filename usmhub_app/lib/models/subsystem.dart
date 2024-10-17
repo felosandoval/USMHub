@@ -40,4 +40,16 @@ class Subsystem {
       _averageRating = ratings.reduce((a, b) => a + b) / ratings.length;
     }
   }
+
+  factory Subsystem.fromJson(Map<String, dynamic> json) {
+    return Subsystem(
+      id: json['id'],
+      name: json['name'],
+      url: json['url'],
+      details: json['details'],
+      procedures: List<String>.from(json['procedures']),
+      ratings: List<double>.from(json['ratings'].map((x) => x.toDouble())),
+      image: json['image'],
+    );
+  }
 }
