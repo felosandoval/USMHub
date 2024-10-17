@@ -29,11 +29,11 @@ class Subsystem {
   Future<void> fetchAndRecalculateAverageRating() async {
     // Ajustar la colección y documento basado en el `nombre` de cada `Subsystem`
     final snapshot = await FirebaseFirestore.instance
-        .collection('ratings')
+        .collection('subsystems')
         .doc(id.toString())
         .collection('userRatings')
         .get();
-    final newRatings = snapshot.docs.map((doc) => doc['valoración'] as double).toList();
+    final newRatings = snapshot.docs.map((doc) => doc['rating'] as double).toList();
     if (newRatings.isNotEmpty) {
       ratings.clear();
       ratings.addAll(newRatings);

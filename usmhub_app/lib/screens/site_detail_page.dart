@@ -43,7 +43,7 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
       try {
         final doc = await _retryOnException(() async {
           return await FirebaseFirestore.instance
-              .collection('ratings')
+              .collection('subsystems')
               .doc(widget.site.id.toString())
               .collection('userRatings')
               .doc(user.email)
@@ -51,7 +51,7 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
         });
         if (doc.exists) {
           setState(() {
-            _userRating = doc['valoración'];
+            _userRating = doc['rating'];
           });
         } else {
           setState(() {
@@ -81,7 +81,7 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
 
   Future<int> _getTotalReviews() async {
     final snapshot = await FirebaseFirestore.instance
-        .collection('ratings')
+        .collection('subsystems')
         .doc(widget.site.id.toString())
         .collection('userRatings')
         .get();
@@ -90,12 +90,12 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
 
   void _calculateAverageRating() async {
     final snapshot = await FirebaseFirestore.instance
-        .collection('ratings')
+        .collection('subsystems')
         .doc(widget.site.id.toString())
         .collection('userRatings')
         .get();
     if (snapshot.docs.isNotEmpty) {
-      final totalRatings = snapshot.docs.map((doc) => doc['valoración'] as double).reduce((a, b) => a + b);
+      final totalRatings = snapshot.docs.map((doc) => doc['rating'] as double).reduce((a, b) => a + b);
       if (mounted) {
         setState(() {
           _averageRating = totalRatings / snapshot.docs.length;
@@ -109,11 +109,11 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser != null) {
       await FirebaseFirestore.instance
-          .collection('ratings')
+          .collection('subsystems')
           .doc(widget.site.id.toString())
           .collection('userRatings')
           .doc(currentUser.email)
-          .set({'valoración': rating});
+          .set({'rating': rating});
       _calculateAverageRating();
     }
   }

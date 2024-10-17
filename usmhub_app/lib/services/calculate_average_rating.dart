@@ -3,13 +3,13 @@ import '../models/subsystem.dart'; // Asegúrate de que la ruta a Subsystem sea 
 
 Future<void> _calculateAverageRating(Subsystem site) async {
   final snapshot = await FirebaseFirestore.instance
-      .collection('ratings')
+      .collection('subsystems')
       .doc(site.id.toString())
       .collection('userRatings')
       .get();
   if (snapshot.docs.isNotEmpty) {
-    final totalRatings = snapshot.docs.map((doc) => doc['valoración'] as double).reduce((a, b) => a + b);
-    site.averageRating = totalRatings / snapshot.docs.length; // Asigna el promedio de valoración al sitio
+    final totalRatings = snapshot.docs.map((doc) => doc['rating'] as double).reduce((a, b) => a + b);
+    site.averageRating = totalRatings / snapshot.docs.length; // Asigna el promedio de Valoración al sitio
   }
 }
 

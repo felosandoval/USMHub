@@ -1,7 +1,7 @@
 {
     "subsystems": [
       {
-        "id": 1,
+        "id": 101,
         "name": "Siga",
         "url": "https://siga.usm.cl",
         "details": "Sistema de información y gestión académica.",
@@ -17,7 +17,7 @@
       },
       
       {
-        "id": 2,
+        "id": 102,
         "name": "Aula",
         "url": "https://aula.usm.cl",
         "details": "Sistema de gestión de aprendizaje.",
@@ -34,7 +34,7 @@
       },
 
       {
-        "id": 3,
+        "id": 103,
         "name": "Autoservicio",
         "url": "https://autoservicio.usm.cl",
         "details": "Portal de autoservicio institucional.",
@@ -50,7 +50,7 @@
       },
 
       {
-        "id": 4,
+        "id": 104,
         "name": "Sireb",
         "url": "https://sireb.usm.cl",
         "details": "Sistema de .",
@@ -67,7 +67,7 @@
       },
 
       {
-        "id": 5,
+        "id": 105,
         "name": "Casino",
         "url": "https://casino.usm.cl",
         "details": "Sistema de Casino de Alimentación USM.",
@@ -81,7 +81,7 @@
       },
 
       {
-        "id": 6,
+        "id": 106,
         "name": "Gitlab DINF",
         "url": "https://gitlab.inf.utfsm.cl/",
         "details": "Sistema de control de versiones y seguimiento de cambios de un proyecto del departamento de informática.",
@@ -95,7 +95,7 @@
       },
 
       {
-        "id": 7,
+        "id": 107,
         "name": "Gitlab Labcom",
         "url": "https://gitlab.labcomp.cl/",
         "details": "Sistema de control de versiones y seguimiento de cambios de un proyecto del laboratorio de computación.",
@@ -109,7 +109,7 @@
       },
 
       {
-        "id": 8,
+        "id": 108,
         "name": "Asuntos Internacionales",
         "url": "https://oai.usm.cl/",
         "details": "Sistema de la oficina de asuntos internacionales.",
@@ -123,7 +123,7 @@
       },
 
       {
-        "id": 9,
+        "id": 109,
         "name": "Minuta",
         "url": "https://vrea.usm.cl/minuta-alimentacion/",
         "details": "Sistema que contiene las minutas de alimentación para los campus y sedes de la Universidad",
@@ -135,7 +135,7 @@
       },
 
       {
-        "id": 10,
+        "id": 110,
         "name": "Trabaja con nosotros",
         "url": "https://usm.hiringroom.com/jobs",
         "details": "Plataforma donde se publican vacantes laborales y se pueden postular a empleos en la Universidad",
@@ -150,7 +150,7 @@
       },
 
       {
-        "id": 11,
+        "id": 111,
         "name": "USM X",
         "url": "https://usmx.cl/",
         "details": "Plataforma de cursos abiertos en línea.",
@@ -165,7 +165,7 @@
       },
 
       {
-        "id": 12,
+        "id": 112,
         "name": "Directorio",
         "url": "https://www.directorio.usm.cl/",
         "details": "Información respecto a funcionarios de la universidad.",
@@ -179,7 +179,7 @@
       },
 
       {
-        "id": 13,
+        "id": 113,
         "name": "Validador de Documentos",
         "url": "https://validaciondocumentos.usm.cl/",
         "details": "Sistema de verificación de documentos emitidos por la Universidad.",
@@ -192,7 +192,7 @@
       },
 
       {
-        "id": 14,
+        "id": 114,
         "name": "Biblioteca Digital",
         "url": "https://bibliotecadigital.usm.cl/",
         "details": "Plataforma de la Universidad que ofrece acceso a recursos académicos en línea, como libros, artículos, y tesis, para estudiantes y profesores.",
@@ -200,7 +200,8 @@
           "Acceso a libros y artículos en formato digital.",
           "Descarga de tesis y publicaciones académicas.",
           "Búsqueda y consulta de recursos especializados.",
-          "Préstamo de libros electrónicos."
+          "Préstamo de libros electrónicos.",
+          "Búsqueda de libros electrónicos."
         ],
         "ratings": [],
         "image": "assets/images/14.jpg"
