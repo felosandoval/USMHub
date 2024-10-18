@@ -136,7 +136,8 @@
         "url": "https://vrea.usm.cl/minuta-alimentacion/",
         "details": "Sistema que contiene las minutas de alimentación para los campus y sedes de la Universidad",
         "procedures": [
-          "Revisar almuerzos"
+          "Revisar almuerzos",
+          "Revisar comidas"
         ],
         "ratings": [],
         "image_internet": "https://drive.usercontent.google.com/uc?id=14gac0tLpcslknzJJo0mUEujtugbWbWOJ&export=download",
@@ -231,6 +232,23 @@
           "Ver ramos",
           "Ver créditos de ramos",
           "Mallas de carrera"
+        ],
+        "ratings": [],
+        "image_internet": "https://drive.usercontent.google.com/uc?id=14QLxZbT0AmyqHj18QnRmRehNWiPlB2iG&export=download",
+        "image_local": "assets/images/14.jpg"
+      },
+
+      {
+        "id": 116,
+        "name": "Recintos deportivos",
+        "url": "https://usmcl-my.sharepoint.com/:x:/g/personal/defider_usm_cl/EV8mkZCO8spOpId_y-l_v-kB_aHEynZerVMvBryiCbAnmQ?rtime=IbpQdMTv3Eg",
+        "details": "Página para revisar el estado de los recintos deportivos",
+        "procedures": [
+          "Ver estado recintos deportivos",
+          "Disponibilidad recintos deportivos",
+          "Revisar préstamo recintos deportivos",
+          "Revisar reserva recintos deportivos",
+          "Revisar canchas de fútbol 7x7 5x5, tenis, squash"
         ],
         "ratings": [],
         "image_internet": "https://drive.usercontent.google.com/uc?id=14QLxZbT0AmyqHj18QnRmRehNWiPlB2iG&export=download",
