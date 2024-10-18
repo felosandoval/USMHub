@@ -219,6 +219,22 @@
         "ratings": [],
         "image_internet": "https://drive.usercontent.google.com/uc?id=14QLxZbT0AmyqHj18QnRmRehNWiPlB2iG&export=download",
         "image_local": "assets/images/14.jpg"
+      },
+
+      {
+        "id": 115,
+        "name": "Malla Interactiva",
+        "url": "https://mallas.labcomp.cl/?m=INF&SCT=true",
+        "details": "Página encargada de visualizar la malla académica de las carreras de la Universidad.",
+        "procedures": [
+          "Malla interactiva",
+          "Ver ramos",
+          "Ver créditos de ramos",
+          "Mallas de carrera"
+        ],
+        "ratings": [],
+        "image_internet": "https://drive.usercontent.google.com/uc?id=14QLxZbT0AmyqHj18QnRmRehNWiPlB2iG&export=download",
+        "image_local": "assets/images/14.jpg"
       }
     ]
   }
