@@ -46,3 +46,4 @@ app.*.map.json
 /node_scripts/node_modules/
 /node_scripts/package.json
 /node_scripts/package-lock.json
+/playstore

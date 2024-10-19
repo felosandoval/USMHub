@@ -23,8 +23,17 @@ if (!fileName) {
 const filePath = path.resolve(fileName);
 const subsystems = JSON.parse(fs.readFileSync(filePath, 'utf8'));
 
-subsystems.subsystems.forEach(async (subsystem) => {
-  await db.collection('subsystems').doc(subsystem.id.toString()).set(subsystem);
+subsystems.usm.forEach(async (subsystem) => {
+  // Crear un nuevo objeto con la combinación de los campos de imagen
+  const newSubsystem = {
+    ...subsystem,
+    image: subsystem.image_internet
+  };
+
+  delete newSubsystem.image_internet;
+  delete newSubsystem.image_local;
+
+  await db.collection('subsystems').doc(subsystem.id.toString()).set(newSubsystem);
 });
 
 console.log('Data successfully written to Firestore');
