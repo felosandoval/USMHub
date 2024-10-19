@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class Subsystem {
   final int id;
   final String name;
@@ -19,26 +17,12 @@ class Subsystem {
     required this.ratings,
     required this.image, // Añadir este campo al constructor
     double? averageRating,
-  }) : _averageRating = averageRating ?? 0.0;
+  }): _averageRating = averageRating ?? 0.0;
 
   double get averageRating => _averageRating;
+  
   set averageRating(double value) {
     _averageRating = value;
-  }
-
-  Future<void> fetchAndRecalculateAverageRating() async {
-    // Ajustar la colección y documento basado en el `nombre` de cada `Subsystem`
-    final snapshot = await FirebaseFirestore.instance
-        .collection('subsystems')
-        .doc(id.toString())
-        .collection('userRatings')
-        .get();
-    final newRatings = snapshot.docs.map((doc) => doc['rating'] as double).toList();
-    if (newRatings.isNotEmpty) {
-      ratings.clear();
-      ratings.addAll(newRatings);
-      _averageRating = ratings.reduce((a, b) => a + b) / ratings.length;
-    }
   }
 
   factory Subsystem.fromJson(Map<String, dynamic> json) {

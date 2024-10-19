@@ -30,7 +30,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> _refreshSites() async {
     final snapshot = await FirebaseFirestore.instance.collection('subsystems').get();
     setState(() {
-      allSites = snapshot.docs.map((doc) => Subsystem.fromJson(doc.data() as Map<String, dynamic>)).toList();
+      allSites = snapshot.docs.map((doc) => Subsystem.fromJson(doc.data())).toList();
       filteredSites = allSites;
       _sortSitesByName();
       _initializeData();
@@ -42,6 +42,21 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       // Actualiza el estado si es necesario
     });
+  }
+
+  Future<void> fetchAndRecalculateAverageRating(Subsystem subsystem) async {
+    // Ajustar la colección y documento basado en el `nombre` de cada `Subsystem`
+    final snapshot = await FirebaseFirestore.instance
+        .collection('subsystems')
+        .doc(subsystem.id.toString())
+        .collection('userRatings')
+        .get();
+    final newRatings = snapshot.docs.map((doc) => doc['rating'] as double).toList();
+    if (newRatings.isNotEmpty) {
+      subsystem.ratings.clear();
+      subsystem.ratings.addAll(newRatings);
+      subsystem.averageRating = subsystem.ratings.reduce((a, b) => a + b) / subsystem.ratings.length;
+    }
   }
 
   void _sortSitesByName() {
@@ -76,7 +91,7 @@ class _HomePageState extends State<HomePage> {
           IconButton(
             icon: Icon(Icons.bar_chart),
             onPressed: () async {
-              await Future.wait(allSites.map((site) => site.fetchAndRecalculateAverageRating()));
+              await Future.wait(allSites.map((site) => fetchAndRecalculateAverageRating(site)));
               setState(() {});
               Navigator.push(
                 context,
