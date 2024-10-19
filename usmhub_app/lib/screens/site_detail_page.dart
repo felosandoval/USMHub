@@ -20,7 +20,6 @@ class SiteDetailPage extends StatefulWidget {
 class _SiteDetailPageState extends State<SiteDetailPage> {
   final AuthService _authService = AuthService(); // Instancia de AuthService
   double? _userRating;
-  double _averageRating = 0.0;
   int _totalReviews = 0;
   final user = FirebaseAuth.instance.currentUser;
 
@@ -98,7 +97,7 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
       final totalRatings = snapshot.docs.map((doc) => doc['rating'] as double).reduce((a, b) => a + b);
       if (mounted) {
         setState(() {
-          _averageRating = totalRatings / snapshot.docs.length;
+          widget.site.averageRating = totalRatings / snapshot.docs.length;
           _totalReviews = snapshot.docs.length;
         });
       }
@@ -150,7 +149,7 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
                   softWrap: true,
                 ),
                 SizedBox(height: 5), // Espacio entre el nombre y las reseñas
-                if (_averageRating > 0)
+                if (widget.site.averageRating > 0)
                   Row(
                     children: [
                       Icon(
@@ -159,7 +158,7 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
                       ),
                       SizedBox(width: 5),
                       Text(
-                        _averageRating.toStringAsFixed(1),
+                        widget.site.averageRating.toStringAsFixed(1),
                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(width: 5),
