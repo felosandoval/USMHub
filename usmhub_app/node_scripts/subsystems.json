@@ -253,6 +253,21 @@
         "ratings": [],
         "image_internet": "https://drive.usercontent.google.com/uc?id=14QLxZbT0AmyqHj18QnRmRehNWiPlB2iG&export=download",
         "image_local": "assets/images/14.jpg"
+      },
+
+      {
+        "id": 117,
+        "name": "Repositorio USM",
+        "url": "https://repositorio.usm.cl/home",
+        "details": "Repositorio de tesis y publicaciones de la Universidad",
+        "procedures": [
+          "Ver tesis",
+          "Ver publicaciones académicas",
+          "Ver memorias"
+        ],
+        "ratings": [],
+        "image_internet": "https://drive.usercontent.google.com/uc?id=14QLxZbT0AmyqHj18QnRmRehNWiPlB2iG&export=download",
+        "image_local": "assets/images/14.jpg"
       }
     ]
   }
