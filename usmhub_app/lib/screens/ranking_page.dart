@@ -3,7 +3,6 @@ import '../models/subsystem.dart';
 
 class RankingsPage extends StatefulWidget {
   final List<Subsystem> sites;
-
   RankingsPage({required this.sites});
 
   @override
@@ -18,15 +17,21 @@ class _RankingsPageState extends State<RankingsPage> {
     sortedSites.sort((a, b) => b.averageRating.compareTo(a.averageRating));
 
     return Scaffold(
-      appBar: AppBar(title: Text('Ranking')),
+      appBar: AppBar(title: Text('Ranking de sitios')),
       body: ListView.builder(
         itemCount: sortedSites.length,
         itemBuilder: (context, index) {
           final site = sortedSites[index];
           return Card(
-            margin: EdgeInsets.all(10),
+            margin: EdgeInsets.symmetric(vertical: 15, horizontal: 35),
             child: ListTile(
-              title: Text('${index + 1}. ${site.name}'),
+              title: Text(
+                '${index + 1}. ${site.name}', // Texto en mayúsculas
+                style: TextStyle(
+                  fontSize: 18, // Ajusta el tamaño según lo que necesites
+                  fontWeight: FontWeight.bold, // Opcional: añade grosor al texto
+                ),
+              ),
               subtitle: Text(
                 site.averageRating == 0
                   ? 'Sin valoraciones'

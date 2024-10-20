@@ -47,3 +47,4 @@ app.*.map.json
 /node_scripts/package.json
 /node_scripts/package-lock.json
 /playstore
+/android/app/google-services.json

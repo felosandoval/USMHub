@@ -22,6 +22,7 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
   double? _userRating;
   int _totalReviews = 0;
   final user = FirebaseAuth.instance.currentUser;
+   bool isRatingLoaded = false; // Variable para controlar si la calificación ha sido cargada
 
   @override
   void initState() {
@@ -30,6 +31,7 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
       if (user != null) {
         setState(() {
+           isRatingLoaded = false; // Restablecer el estado de carga de la calificación
           _checkUserRating();
         });
       }
@@ -57,6 +59,7 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
             _userRating = null;
           });
         }
+        isRatingLoaded = true; // Marcar que la calificación ha sido cargada
         _calculateAverageRating();
       } catch (e) {
         print('Error al obtener el rating del usuario: $e');
@@ -218,39 +221,42 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
             ),
             SizedBox(height: 10),
             if (user != null) ...[
-              // RESEÑAS (5 ESTRELLAS)
-              Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    RatingBar.builder(
-                      initialRating: _userRating ?? 0.0,
-                      minRating: 1,
-                      direction: Axis.horizontal,
-                      allowHalfRating: true,
-                      itemCount: 5,
-                      itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-                      itemBuilder: (context, _) => Icon(
-                        Icons.star,
-                        color: Colors.amber,
+              // Mostrar las estrellas solo si la calificación ha sido cargada
+              if (isRatingLoaded) ...[
+                Center(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      RatingBar.builder(
+                        initialRating: _userRating ?? 0.0,
+                        minRating: 1,
+                        direction: Axis.horizontal,
+                        allowHalfRating: true,
+                        itemCount: 5,
+                        itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                        itemBuilder: (context, _) => Icon(
+                          Icons.star,
+                          color: Colors.amber,
+                        ),
+                        onRatingUpdate: (rating) {
+                          setState(() {
+                            _userRating = rating;
+                          });
+                          _submitRating(rating);
+                        },
                       ),
-                      onRatingUpdate: (rating) {
-                        setState(() {
-                          _userRating = rating;
-                        });
-                        _submitRating(rating);
-                      },
-                    ),
-                    SizedBox(width: 10), // Espacio entre las estrellas y el texto
-                    Text(
-                      _userRating?.toStringAsFixed(1) ?? '0.0',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                  ],
+                      SizedBox(width: 10), // Espacio entre las estrellas y el texto
+                      Text(
+                        _userRating?.toStringAsFixed(1) ?? '0.0',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
+              ],
+              // Si no se ha cargado la calificación, no se muestra nada
               SizedBox(height: 20),
-              // Botón de cerrar sesión
+              // Botón de cerrar sesión...
               Center(
                 child: ElevatedButton(
                   onPressed: () async {
@@ -267,6 +273,7 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
                   onPressed: () async {
                     await _authService.signInWithGoogle(context, () {
                       setState(() {
+                        _userRating = 0.0; // Restablecer la calificación al iniciar sesión
                         _checkUserRating();
                       });
                     });

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'calendar_page.dart';
 import 'ranking_page.dart';
 import 'site_detail_page.dart';
@@ -16,25 +17,61 @@ class _HomePageState extends State<HomePage> {
   TextEditingController textEditingController = TextEditingController();
   List<Subsystem> allSites = [];
   List<Subsystem> filteredSites = [];
+  List<Subsystem> pinnedSites = []; // Lista de sitios fijados
   ValueNotifier<bool> _isTextPresent = ValueNotifier<bool>(false);
+  SharedPreferences? prefs; // Variable para SharedPreferences
 
   @override
   void initState() {
     super.initState();
-    _refreshSites(); // Initial data load
+    _initSharedPreferences();
     textEditingController.addListener(() {
       _isTextPresent.value = textEditingController.text.isNotEmpty;
     });
   }
 
+  // Inicializa SharedPreferences y recarga sitios pineados
+  Future<void> _initSharedPreferences() async {
+    prefs = await SharedPreferences.getInstance();
+    await _refreshSites(); // Espera a que se carguen los sitios
+    _loadPinnedSites(); // Cargar los sitios pinneados aquí
+  }
+
+  // Refresca los sitios en base a los datos de firebase
   Future<void> _refreshSites() async {
     final snapshot = await FirebaseFirestore.instance.collection('subsystems').get();
     setState(() {
       allSites = snapshot.docs.map((doc) => Subsystem.fromJson(doc.data())).toList();
-      filteredSites = allSites;
+      filteredSites = List.from(allSites); // Copiar la lista completa
+      _loadPinnedSites(); // Restaurar los sitios pinneados desde SharedPreferences
       _sortSitesByName();
+      _reorderPinnedSites(); // Reordenar sitios fijados
       _initializeData();
     });
+  }
+
+  // Cargar sitios pinneados desde SharedPreferences
+  void _loadPinnedSites() {
+    final pinnedSiteIds = prefs?.getStringList('pinnedSites') ?? [];
+    //print('Sitios fijados recuperados: $pinnedSiteIds');
+    setState(() {
+      pinnedSites = allSites.where((site) {
+        final siteId = site.id.toString(); // Convertir ID del sitio a String
+        final isPinned = pinnedSiteIds.contains(siteId);
+        //print('Verificando si el sitio $siteId está fijado: $isPinned');
+        return isPinned;
+      }).toList();
+      //print('Sitios fijados en memoria: ${pinnedSites.map((site) => site.name).toList()}');
+    });
+  }
+
+  // Guardar los sitios pinneados en SharedPreferences
+  void _savePinnedSites() {
+    final pinnedSiteIds = pinnedSites.map((site) => site.id.toString()).toList(); // Convertir a String
+    prefs?.setStringList('pinnedSites', pinnedSiteIds);
+
+    // Se Verifica el contenido guardado
+    //print('Sitios fijados guardados: $pinnedSiteIds');
   }
 
   Future<void> _initializeData() async {
@@ -65,6 +102,30 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  // Reordenar sitios para que los pineados vayan al inicio
+  void _reorderPinnedSites() {
+    setState(() {
+      filteredSites.sort((a, b) {
+        if (pinnedSites.contains(a) && !pinnedSites.contains(b)) return -1;
+        if (!pinnedSites.contains(a) && pinnedSites.contains(b)) return 1;
+        return a.name.compareTo(b.name);
+      });
+    });
+  }
+
+  // Actualizar la lista de sitios pinneados y guardar en SharedPreferences
+  void _pinSite(Subsystem site) {
+    setState(() {
+      if (pinnedSites.contains(site)) {
+        pinnedSites.remove(site);
+      } else {
+        pinnedSites.add(site);
+      }
+      _reorderPinnedSites(); // Restaurar el orden con los sitios pinneados
+      _savePinnedSites(); // Guardar los cambios en SharedPreferences
+    });
+  }
+
   @override
   void dispose() {
     textEditingController.dispose();
@@ -87,6 +148,8 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(context, MaterialPageRoute(builder: (_) => CalendarPage()));
             },
           ),
+          SizedBox(width: 6),
+          
           // BOTÓN DE RANKING
           IconButton(
             icon: Icon(Icons.bar_chart),
@@ -101,6 +164,7 @@ class _HomePageState extends State<HomePage> {
               );
             },
           ),
+          SizedBox(width: 10),
         ],
       ),
       body: Column(
@@ -123,13 +187,14 @@ class _HomePageState extends State<HomePage> {
                         filteredSites = allSites.where((site) {
                           final lowerCaseQuery = text.toLowerCase();
                           final matchesName = site.name.toLowerCase().contains(lowerCaseQuery);
-                          final matchesProcedures = site.procedures
-                              .any((procedure) => procedure.toLowerCase().contains(lowerCaseQuery));
+                          final matchesProcedures = site.procedures.any((procedure) => procedure.toLowerCase().contains(lowerCaseQuery));
                           return matchesName || matchesProcedures;
                         }).toList();
-                        _sortSitesByName();  // Ordenar cada vez que se filtra
+
+                        _reorderPinnedSites(); // Reordenar para que los sitios fijados vayan al inicio
                       });
                     },
+
                     decoration: InputDecoration(
                       hintText: 'Buscar sitios, servicios o trámites...',
                       hintStyle: GoogleFonts.openSans(
@@ -142,14 +207,15 @@ class _HomePageState extends State<HomePage> {
                             icon: Icon(Icons.clear),
                             onPressed: () {
                               setState(() {
-                                filteredSites = allSites;
-                                _sortSitesByName();  // Ordenar cuando se limpia el filtro
+                                filteredSites = allSites; // Resetear la lista a todos los sitios
+                                _sortSitesByName(); // Ordenar por nombre
+                                _reorderPinnedSites(); // Reordenar para que los sitios fijados estén arriba
                               });
-                              textEditingController.clear();
+                              textEditingController.clear(); // Limpiar el texto del cuadro de búsqueda
                             },
                           )
-                          : null,
-                      border: InputBorder.none, // Sin bordes adicionales para el TextField
+                        : null,
+                      border: InputBorder.none, // Sin bordes adicionales
                       contentPadding: EdgeInsets.symmetric(vertical: 15), // Centrar verticalmente
                     ),
                     style: TextStyle(height: 1.5), // Centrar el texto
@@ -171,17 +237,18 @@ class _HomePageState extends State<HomePage> {
                   ),
                   itemCount: filteredSites.length,
                   itemBuilder: (context, index) {
+                    final site = filteredSites[index];
                     return Card(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15.0),
                       ),
-                      clipBehavior: Clip.antiAlias, // Esto permite que el contenido se recorte en los bordes redondeados
+                      clipBehavior: Clip.antiAlias, // Contenido se recorte en los bordes redondeados
                       child: InkWell(
                         onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => SiteDetailPage(site: filteredSites[index]),
+                              builder: (_) => SiteDetailPage(site: site),
                             ),
                           );
                         },
@@ -190,13 +257,15 @@ class _HomePageState extends State<HomePage> {
                             Container(
                               decoration: BoxDecoration(
                                 image: DecorationImage(
-                                  image: filteredSites[index].image.startsWith('http')
-                                    ? NetworkImage(filteredSites[index].image)
-                                    : AssetImage(filteredSites[index].image),
+                                  image: site.image.startsWith('http')
+                                    ? NetworkImage(site.image)
+                                    : AssetImage(site.image),
                                   fit: BoxFit.cover,
                                 ),
                               ),
                             ),
+
+                            // DEGRADE
                             Container(
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
@@ -206,14 +275,35 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ),
                             ),
+
+                            // ICONO PIN DENTRO DE UN CÍRCULO
+                            Positioned(
+                              top: 20,
+                              right: 20,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.black.withOpacity(0.5), // Fondo oscuro para visibilidad
+                                ),
+                                child: IconButton(
+                                  icon: Icon(
+                                    pinnedSites.contains(site)
+                                        ? Icons.push_pin
+                                        : Icons.push_pin_outlined,
+                                    color: pinnedSites.contains(site) ? Color.fromARGB(255, 247, 173, 1) : Colors.white,
+                                  ),
+                                  onPressed: () => _pinSite(site),
+                                ),
+                              ),
+                            ),
                             Positioned(
                               bottom: 20,
                               left: 20,
-                              right: 0,
+                              right: 9,
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Text(
-                                  filteredSites[index].name,
+                                  site.name,
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 18,
