@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+
 import 'calendar_page.dart';
 import 'ranking_page.dart';
 import 'site_detail_page.dart';
+
 import '../models/subsystem.dart';
 import '../services/calculate_average_rating.dart';
 
@@ -258,8 +261,9 @@ class _HomePageState extends State<HomePage> {
                               decoration: BoxDecoration(
                                 image: DecorationImage(
                                   image: site.image.startsWith('http')
-                                    ? NetworkImage(site.image)
-                                    : AssetImage(site.image),
+                                    ? CachedNetworkImageProvider(site.image) // Usa CachedNetworkImageProvider para URLs
+                                    : AssetImage(site.image), // Usa AssetImage para imágenes locales
+
                                   fit: BoxFit.cover,
                                 ),
                               ),
