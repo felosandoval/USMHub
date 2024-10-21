@@ -15,6 +15,14 @@ class AuthService {
       _showMessage(context, 'Por favor, para calificar, seleccione su cuenta');
       return null;
     }
+
+    // Verificación del dominio de correo
+    if (!RegExp(r'^.*@sansano\.usm\.cl$').hasMatch(googleUser.email)) {
+      _showMessage(context, 'Solo se permiten correos Institucionales');
+      await GoogleSignIn().signOut(); // Desconectar Google Sign-In si no es válido
+      return null;
+    }
+
     final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
     final AuthCredential credential = GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,
