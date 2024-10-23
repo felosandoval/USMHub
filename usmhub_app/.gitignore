@@ -48,3 +48,4 @@ app.*.map.json
 /node_scripts/package-lock.json
 /playstore
 /android/app/google-services.json
+/release.keystore

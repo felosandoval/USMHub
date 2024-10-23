@@ -8,7 +8,6 @@ plugins {
     // END: FlutterFire Configuration
 }
 
-
 android {
     namespace = "com.usmhub.app"
     compileSdk = flutter.compileSdkVersion
@@ -27,7 +26,7 @@ android {
         applicationId = "com.usmhub.app"
         minSdkVersion 23
         targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
+        versionCode = 3
         versionName = flutter.versionName
     }
 

@@ -7,16 +7,22 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'calendar_page.dart';
 import 'ranking_page.dart';
 import 'site_detail_page.dart';
+import 'home_universities.dart';
 
 import '../models/subsystem.dart';
+import '../models/university.dart';
 import '../services/calculate_average_rating.dart';
 
-class HomePage extends StatefulWidget {
+class SubsystemsPage extends StatefulWidget {
+  final University university;
+
+  SubsystemsPage({required this.university});
+
   @override
-  _HomePageState createState() => _HomePageState();
+  _SubsystemsPageState createState() => _SubsystemsPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _SubsystemsPageState extends State<SubsystemsPage> {
   TextEditingController textEditingController = TextEditingController();
   List<Subsystem> allSites = [];
   List<Subsystem> filteredSites = [];
@@ -42,7 +48,10 @@ class _HomePageState extends State<HomePage> {
 
   // Refresca los sitios en base a los datos de firebase
   Future<void> _refreshSites() async {
-    final snapshot = await FirebaseFirestore.instance.collection('subsystems').get();
+    final snapshot = await FirebaseFirestore.instance
+      .collection('universities')
+      .doc(widget.university.id.toString())
+      .collection('subsystems').get();
     setState(() {
       allSites = snapshot.docs.map((doc) => Subsystem.fromJson(doc.data())).toList();
       filteredSites = List.from(allSites); // Copiar la lista completa
@@ -84,18 +93,24 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  Future<void> fetchAndRecalculateAverageRating(Subsystem subsystem) async {
-    // Ajustar la colección y documento basado en el `nombre` de cada `Subsystem`
+  Future<void> fetchAndRecalculateAverageRating(Subsystem subsystem, University university) async {
+    // Ajustar la colección y documento basado en el `nombre` de cada `Subsystem` y el ID de la universidad
     final snapshot = await FirebaseFirestore.instance
-        .collection('subsystems')
-        .doc(subsystem.id.toString())
-        .collection('userRatings')
+        .collection('universities') // Colección de universidades
+        .doc(university.id.toString()) // Usar el ID de la universidad desde el objeto
+        .collection('subsystems') // Colección de subsistemas dentro de la universidad
+        .doc(subsystem.id.toString()) // ID del subsistema
+        .collection('userRatings') // Colección de calificaciones de usuarios
         .get();
+
     final newRatings = snapshot.docs.map((doc) => doc['rating'] as double).toList();
+    
     if (newRatings.isNotEmpty) {
       subsystem.ratings.clear();
       subsystem.ratings.addAll(newRatings);
       subsystem.averageRating = subsystem.ratings.reduce((a, b) => a + b) / subsystem.ratings.length;
+    } else {
+      subsystem.averageRating = 0; // Establecer un promedio de 0 si no hay calificaciones
     }
   }
 
@@ -139,9 +154,18 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'USM Hub',
-          style: GoogleFonts.roboto(fontSize: 25),
+        title: GestureDetector(
+          onTap: () {
+            // Al hacer clic en el acrónimo, navegar de regreso a HomeUniversities
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => HomeUniversities()),
+            );
+          },
+          child: Text(
+            widget.university.acronyms,
+            style: GoogleFonts.roboto(fontSize: 25),
+          ),
         ),
         actions: [
           // BOTÓN DE CALENDARIO
@@ -153,11 +177,13 @@ class _HomePageState extends State<HomePage> {
           ),
           SizedBox(width: 6),
           
+
+
           // BOTÓN DE RANKING
           IconButton(
             icon: Icon(Icons.bar_chart),
             onPressed: () async {
-              await Future.wait(allSites.map((site) => fetchAndRecalculateAverageRating(site)));
+              await Future.wait(allSites.map((site) => fetchAndRecalculateAverageRating(site, widget.university)));
               setState(() {});
               Navigator.push(
                 context,
@@ -199,7 +225,7 @@ class _HomePageState extends State<HomePage> {
                     },
 
                     decoration: InputDecoration(
-                      hintText: 'Buscar sitios, servicios o trámites...',
+                      hintText: '   Buscar sitios o trámites...',
                       hintStyle: GoogleFonts.openSans(
                         fontSize: 17,
                         color: Colors.grey,
@@ -251,7 +277,7 @@ class _HomePageState extends State<HomePage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => SiteDetailPage(site: site),
+                              builder: (_) => SiteDetailPage(site: site, university: widget.university,),
                             ),
                           );
                         },

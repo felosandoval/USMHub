@@ -4,14 +4,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:usmhub_app/models/university.dart';
 
 import '../models/subsystem.dart';
 import '../services/auth_service.dart';
 
 class SiteDetailPage extends StatefulWidget {
   final Subsystem site;
+  final University university;
 
-  SiteDetailPage({required this.site});
+  SiteDetailPage({required this.site, required this.university});
 
   @override
   _SiteDetailPageState createState() => _SiteDetailPageState();
@@ -44,6 +46,8 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
       try {
         final doc = await _retryOnException(() async {
           return await FirebaseFirestore.instance
+              .collection('universities')
+              .doc(widget.university.id.toString())
               .collection('subsystems')
               .doc(widget.site.id.toString())
               .collection('userRatings')
@@ -83,6 +87,8 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
 
   Future<int> _getTotalReviews() async {
     final snapshot = await FirebaseFirestore.instance
+        .collection('universities')
+        .doc(widget.university.id.toString())
         .collection('subsystems')
         .doc(widget.site.id.toString())
         .collection('userRatings')
@@ -92,6 +98,8 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
 
   void _calculateAverageRating() async {
     final snapshot = await FirebaseFirestore.instance
+        .collection('universities')
+        .doc(widget.university.id.toString())
         .collection('subsystems')
         .doc(widget.site.id.toString())
         .collection('userRatings')
@@ -111,6 +119,8 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
     final currentUser = FirebaseAuth.instance.currentUser;
     if (currentUser != null) {
       await FirebaseFirestore.instance
+          .collection('universities')
+          .doc(widget.university.id.toString())
           .collection('subsystems')
           .doc(widget.site.id.toString())
           .collection('userRatings')
