@@ -174,7 +174,13 @@ class _SubsystemsPageState extends State<SubsystemsPage> {
           IconButton(
             icon: Icon(Icons.calendar_today),
             onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => CalendarPage()));
+
+              Navigator.push(
+                context, 
+                MaterialPageRoute(
+                  builder: (_) => CalendarPage()
+                )
+              );
             },
           ),
           SizedBox(width: 6),
