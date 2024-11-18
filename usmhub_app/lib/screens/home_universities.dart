@@ -57,7 +57,6 @@ class _HomeUniversitiesState extends State<HomeUniversities> {
     await prefs.setString('selectedUniversity', universityJson); // Guarda como string
   }
 
-
   // Cargar universidades fijadas desde SharedPreferences
   void _loadPinnedUniversities() {
     final pinnedUniversityIds = prefs?.getStringList('pinnedUniversities') ?? [];
@@ -190,16 +189,14 @@ class _HomeUniversitiesState extends State<HomeUniversities> {
                   itemCount: filteredUniversities.length,
                   itemBuilder: (context, index) {
                     final university = filteredUniversities[index];
-
-                    _saveSelectedUniversity(university);
-                    
                     return Card(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15.0),
                       ),
                       clipBehavior: Clip.antiAlias, // Contenido se recorte en los bordes redondeados
                       child: InkWell(
-                        onTap: () {
+                        onTap: () async {
+                          await _saveSelectedUniversity(university); // Guardar la universidad seleccionada
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -207,6 +204,7 @@ class _HomeUniversitiesState extends State<HomeUniversities> {
                             ),
                           );
                         },
+
                         child: Stack(
                           children: [
                             Container(
@@ -281,9 +279,6 @@ class _HomeUniversitiesState extends State<HomeUniversities> {
                                 ),
                               ),
                             ),
-
-
-
                           ],
                         ),
                       ),
