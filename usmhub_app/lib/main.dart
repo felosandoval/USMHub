@@ -9,6 +9,12 @@ import 'screens/home_universities.dart';
 import 'screens/subsystems_page.dart';
 import 'models/university.dart';
 
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:permission_handler/permission_handler.dart';
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 Future<University?> _getSelectedUniversity() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -25,6 +31,12 @@ Future<University?> _getSelectedUniversity() async {
   return null; // Si no hay universidad guardada
 }
 
+Future<void> requestNotificationPermission() async {
+    if (await Permission.notification.isDenied) {
+      await Permission.notification.request();
+    }
+  }
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -33,6 +45,16 @@ void main() async {
 
   University? selectedUniversity = await _getSelectedUniversity(); // Obtener la universidad guardada
 
+  tz.initializeTimeZones(); // Inicializa las zonas horarias
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
+
+  const InitializationSettings initializationSettings =
+      InitializationSettings(android: initializationSettingsAndroid);
+
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  await requestNotificationPermission();
+  
   runApp(MyApp(selectedUniversity: selectedUniversity));
 }
 

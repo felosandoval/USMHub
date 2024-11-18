@@ -4,6 +4,10 @@ import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:icalendar_parser/icalendar_parser.dart';
 import '../models/meeting.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import '../main.dart'; // Ajusta el path según la estructura de tu proyecto
+import 'package:timezone/timezone.dart' as tz;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CalendarPage extends StatefulWidget {
   @override
@@ -13,6 +17,7 @@ class CalendarPage extends StatefulWidget {
 class _CalendarPageState extends State<CalendarPage> {
   List<Meeting> meetings = [];
   List<Meeting> filteredMeetings = [];
+  Set<String> scheduledEventIds = {};
 
   final List<String> icsFiles = [
     // https://vra.usm.cl/eventos/mes/2025-01/?ical=1
@@ -28,7 +33,9 @@ class _CalendarPageState extends State<CalendarPage> {
   void initState() {
     super.initState();
     _calendarController = CalendarController();
-    _loadIcsFiles(); // Cargar los eventos de los archivos .ics
+    loadScheduledEventIds().then((_) {
+      _loadIcsFiles(); // Carga los eventos después de recuperar los programados
+  });
   }
 
   Future<void> _loadIcsFiles() async {
@@ -45,7 +52,7 @@ class _CalendarPageState extends State<CalendarPage> {
         if (event['categories'] != null) {
           var categories = event['categories'];
           if (categories is List) {
-            category = categories.join(', '); // Guardar todas las categorías
+            category = categories.join(', ');
           } else if (categories is String) {
             category = categories;
           }
@@ -55,16 +62,78 @@ class _CalendarPageState extends State<CalendarPage> {
           DateTime eventEndDate = (endDate != null)
               ? DateTime.parse(endDate.toString()).subtract(Duration(days: 1))
               : eventStartDate;
-          Color eventColor = _getColorForCategory(category.split(',')[0]); // Usar la primera categoría para el color
-          loadedMeetings.add(Meeting(summary, eventStartDate, eventEndDate, eventColor, false, category));
+
+          // Crear un identificador único para el evento
+          String uniqueId = '${eventStartDate.toIso8601String()}_$summary';
+          print('Generando ID único para el evento: $uniqueId');
+
+          // Crear el evento siempre
+          Color eventColor = _getColorForCategory(category.split(',')[0]);
+          final meeting = Meeting(summary, eventStartDate, eventEndDate, eventColor, false, category);
+          loadedMeetings.add(meeting);
+
+          // Programar notificaciones solo para eventos futuros que no hayan sido programados
+          if (eventStartDate.isAfter(DateTime.now()) && !scheduledEventIds.contains(uniqueId)) {
+            await scheduleNotification(meeting);
+            scheduledEventIds.add(uniqueId);
+            print('Notificación programada evento: ${meeting.eventName}');
+            
+            await saveScheduledEventIds(); // Guardar los identificadores
+          } else if (scheduledEventIds.contains(uniqueId)) {
+            print('Notificación ya programada para el evento: ${meeting.eventName}');
+          } else {
+            print('Evento pasado (sin notificación): $summary en $eventStartDate');
+
+          }
         }
       }
     }
     setState(() {
       meetings = loadedMeetings;
-      filteredMeetings = meetings; // Inicialmente, mostrar todos los eventos
+      filteredMeetings = meetings; // Mostrar todos los eventos inicialmente
     });
   }
+  Future<void> scheduleNotification(Meeting meeting) async {
+    final notificationId = meeting.hashCode; // ID único basado en el evento
+    final eventDate = meeting.from.subtract(Duration(minutes: 15)); // 1 dias antes del evento
+    print('Notificación programada para: $eventDate');
+
+    // Verifica que el evento no sea en el pasado
+    if (eventDate.isBefore(DateTime.now())) return;
+
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+      notificationId,
+      meeting.eventName, // Título
+      'El evento ${meeting.eventName} comienza a las ${formatDateTime(meeting.from)}.', // Cuerpo
+      tz.TZDateTime.from(eventDate, tz.local), // Fecha con zona horaria
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'channel_id', // ID del canal
+          'channel_name', // Nombre del canal
+          channelDescription: 'Descripción del canal',
+          importance: Importance.max,
+          priority: Priority.high,
+        ),
+      ),
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+      androidScheduleMode: AndroidScheduleMode.inexact, // Agregar este parámetro
+    );
+  }
+
+  Future<void> saveScheduledEventIds() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('scheduledEventIds', scheduledEventIds.toList());
+    print('Identificadores guardados: $scheduledEventIds');
+  }
+
+  Future<void> loadScheduledEventIds() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedIds = prefs.getStringList('scheduledEventIds') ?? [];
+    scheduledEventIds = savedIds.toSet();
+    print('Identificadores cargados: $scheduledEventIds');
+  }
+
 
 
   Color _getColorForCategory(String category) {
