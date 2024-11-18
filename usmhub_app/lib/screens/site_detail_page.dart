@@ -131,178 +131,241 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
   }
 
   @override
+
+
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            Text("Información del sitio"),
-            SizedBox(width: 10),
-          ],
+        title: Text(
+          "Información del sitio",
+          style: GoogleFonts.roboto(fontWeight: FontWeight.bold),
         ),
+        centerTitle: true,
+        elevation: 0,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            // Título con imagen de fondo (título en parte inferior izquierda)
+            Stack(
               children: [
-                Text(
-                  widget.site.name,
-                  style: GoogleFonts.roboto(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                // Imagen de fondo
+                Container(
+                  width: double.infinity,
+                  height: 200,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: NetworkImage(widget.site.image), // Usando site.image
+                      fit: BoxFit.cover,
+                    ),
+                    borderRadius: BorderRadius.circular(16.0),
                   ),
-                  overflow: TextOverflow.visible,
-                  maxLines: null,
-                  softWrap: true,
                 ),
-                SizedBox(height: 5), // Espacio entre el nombre y las reseñas
-                if (widget.site.averageRating > 0)
-                  Row(
+                // Sombreado para mejorar la legibilidad del texto
+                Container(
+                  width: double.infinity,
+                  height: 200,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16.0),
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.black.withOpacity(0.6),
+                        Colors.transparent,
+                      ],
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                    ),
+                  ),
+                ),
+                // Texto del título con borde negro
+                Positioned(
+                  bottom: 16,
+                  left: 16,
+                  child: Stack(
                     children: [
-                      Icon(
-                        Icons.star,
-                        color: Colors.amber, // Puedes cambiar el color si prefieres otro
-                      ),
-                      SizedBox(width: 5),
+                      // Texto con borde negro (stroke)
+                      // Texto blanco relleno
                       Text(
-                        widget.site.averageRating.toStringAsFixed(1),
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(width: 5),
-                      FutureBuilder<int>(
-                        future: _getTotalReviews(),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasError) {
-                            return Text(
-                              '($_totalReviews reseñas)', // Mostrar el total de reseñas que tenemos
-                              style: TextStyle(fontSize: 16, color: Colors.grey),
-                            );
-                          } else {
-                            return Text(
-                              '(${snapshot.data ?? _totalReviews} reseñas)', // Mostrar el total de reseñas del snapshot o el total que tenemos
-                              style: TextStyle(fontSize: 16, color: Colors.grey),
-                            );
-                          }
-                        },
+                        widget.site.name,
+                        style: GoogleFonts.roboto(
+                          fontSize: 30, // Aumentar el tamaño de la fuente
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
                     ],
                   ),
+                ),
               ],
             ),
-            SizedBox(height: 10),
+            SizedBox(height: 20),
+            // Calificación
+            if (widget.site.averageRating > 0)
+              Row(
+                children: [
+                  Icon(Icons.star, color: Colors.amber, size: 24),
+                  SizedBox(width: 5),
+                  Text(
+                    widget.site.averageRating.toStringAsFixed(1),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(width: 5),
+                  FutureBuilder<int>(
+                    future: _getTotalReviews(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        return Text(
+                          '($_totalReviews reseñas)',
+                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                        );
+                      } else {
+                        return Text(
+                          '(${snapshot.data ?? _totalReviews} reseñas)',
+                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
+            Divider(height: 30, thickness: 1),
+            // Descripción
             Text(
               widget.site.details,
               style: GoogleFonts.roboto(
                 fontSize: 18,
+                color: Colors.black87,
               ),
             ),
             SizedBox(height: 20),
+            // Trámites disponibles
             Text(
               'Trámites disponibles:',
               style: GoogleFonts.roboto(
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
+                color: Colors.black87,
               ),
             ),
             SizedBox(height: 10),
-            ...widget.site.procedures.map((procedure) => Text(
-                  '• $procedure',
-                  style: TextStyle(fontSize: 18),
-                )).toList(),
-            Center(
-              child: ElevatedButton(
-                onPressed: () => _launchURL(widget.site.url),
-                child: Text('IR AL SITIO'),
-              ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Calificar este sitio:',
-              style: GoogleFonts.roboto(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 10),
-            if (user != null) ...[
-              // Mostrar las estrellas solo si la calificación ha sido cargada
-              if (isRatingLoaded) ...[
-                Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      RatingBar.builder(
-                        initialRating: _userRating ?? 0.0,
-                        minRating: 1,
-                        direction: Axis.horizontal,
-                        allowHalfRating: true,
-                        itemCount: 5,
-                        itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-                        itemBuilder: (context, _) => Icon(
-                          Icons.star,
-                          color: Colors.amber,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: widget.site.procedures
+                  .map((procedure) => Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4.0),
+                        child: Row(
+                          children: [
+                            Icon(Icons.check_circle_outline, color: Colors.green),
+                            SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                procedure,
+                                style: TextStyle(fontSize: 18),
+                              ),
+                            ),
+                          ],
                         ),
-                        onRatingUpdate: (rating) {
-                          setState(() {
-                            _userRating = rating;
-                          });
-                          _submitRating(rating);
-                        },
-                      ),
-                      SizedBox(width: 10), // Espacio entre las estrellas y el texto
-                      Text(
-                        _userRating?.toStringAsFixed(1) ?? '0.0',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                    ],
+                      ))
+                  .toList(),
+            ),
+            SizedBox(height: 30),
+            // Botón IR AL SITIO (agrandado)
+            Center(
+              child: SizedBox(
+                width: double.infinity, // Hacer que el botón ocupe todo el ancho posible
+                child: ElevatedButton(
+                  onPressed: () => _launchURL(widget.site.url),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 10), // Aumentar el padding vertical
+                    child: Text(
+                      'Ir al Sitio',
+                      style: TextStyle(fontSize: 20), // Aumentar el tamaño de la letra
+                    ),
                   ),
                 ),
-              ],
-              // Si no se ha cargado la calificación, no se muestra nada
-              SizedBox(height: 20),
-              // Botón de cerrar sesión...
-              Center(
-                child: ElevatedButton(
-                  onPressed: () async {
-                    await _authService.signOutWithGoogle();
-                    setState(() {});
-                    _checkUserRating();
-                  },
-                  child: Text('Cerrar sesión'),
-                ),
               ),
-            ] else ...[
-              Center(
-                child: ElevatedButton(
-                  onPressed: () async {
-                    await _authService.signInWithGoogle(context, () {
-                      setState(() {
-                        _userRating = 0.0; // Restablecer la calificación al iniciar sesión
+            ),
+            SizedBox(height: 30),
+            // Calificar este sitio (centrado)
+            Center(
+              child: Column(
+                children: [
+                  Text(
+                    'Calificar este sitio:',
+                    style: GoogleFonts.roboto(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 10),
+                  if (user != null) ...[
+                    if (isRatingLoaded)
+                      Column(
+                        children: [
+                          RatingBar.builder(
+                            initialRating: _userRating ?? 0.0,
+                            minRating: 1,
+                            direction: Axis.horizontal,
+                            allowHalfRating: true,
+                            itemCount: 5,
+                            itemBuilder: (context, _) =>
+                                Icon(Icons.star, color: Colors.amber),
+                            onRatingUpdate: (rating) {
+                              setState(() {
+                                _userRating = rating;
+                              });
+                              _submitRating(rating);
+                            },
+                          ),
+                          SizedBox(height: 10),
+                          Text(
+                            _userRating?.toStringAsFixed(1) ?? '0.0',
+                            style:
+                                TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () async {
+                        await _authService.signOutWithGoogle();
+                        setState(() {});
                         _checkUserRating();
-                      });
-                    });
-                  },
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Image.asset(
-                        'assets/images/logo_google.png',
-                        height: 24.0,
-                        width: 24.0,
+                      },
+                      child: Text('Cerrar sesión'),
+                    ),
+                  ] else ...[
+                    ElevatedButton(
+                      onPressed: () async {
+                        await _authService.signInWithGoogle(context, () {
+                          setState(() {
+                            _userRating = 0.0;
+                            _checkUserRating();
+                          });
+                        });
+                      },
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Image.asset(
+                            'assets/images/logo_google.png',
+                            height: 24.0,
+                            width: 24.0,
+                          ),
+                          SizedBox(width: 10),
+                          Text('Continuar con Google'),
+                        ],
                       ),
-                      SizedBox(width: 10), // Espacio entre el icono y el texto
-                      Text('Continuar con Google'),
-                    ],
-                  ),
-                ),
+                    ),
+                  ],
+                ],
               ),
-            ],
+            ),
           ],
         ),
       ),
