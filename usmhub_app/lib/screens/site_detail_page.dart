@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:usmhub_app/models/university.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../models/subsystem.dart';
 import '../services/auth_service.dart';
@@ -158,7 +159,7 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
                   height: 200,
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                      image: NetworkImage(widget.site.image), // Usando site.image
+                      image: CachedNetworkImageProvider(widget.site.image), // Usando site.image
                       fit: BoxFit.cover,
                     ),
                     borderRadius: BorderRadius.circular(16.0),
@@ -275,14 +276,22 @@ class _SiteDetailPageState extends State<SiteDetailPage> {
             // Botón IR AL SITIO (agrandado)
             Center(
               child: SizedBox(
-                width: double.infinity, // Hacer que el botón ocupe todo el ancho posible
+                width: 220, // Hacer que el botón ocupe todo el ancho posible
                 child: ElevatedButton(
                   onPressed: () => _launchURL(widget.site.url),
                   child: Padding(
                     padding: EdgeInsets.symmetric(vertical: 10), // Aumentar el padding vertical
-                    child: Text(
-                      'Ir al Sitio',
-                      style: TextStyle(fontSize: 20), // Aumentar el tamaño de la letra
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.link), // Icono de internet a la izquierda del texto
+                        SizedBox(width: 8), // Espacio entre el icono y el texto
+                        Text(
+                          'Ir al Sitio',
+                          style: TextStyle(fontSize: 18), // Aumentar el tamaño de la letra
+                        ),
+                      ],
                     ),
                   ),
                 ),

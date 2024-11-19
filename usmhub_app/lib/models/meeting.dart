@@ -10,6 +10,40 @@ class Meeting {
   Color background;
   bool isAllDay;
   String category;
+
+  // Comparar dos objetos Meeting
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Meeting &&
+          runtimeType == other.runtimeType &&
+          eventName == other.eventName &&
+          from == other.from &&
+          to == other.to &&
+          category == other.category;
+
+  @override
+  int get hashCode =>
+      eventName.hashCode ^ from.hashCode ^ to.hashCode ^ category.hashCode;
+
+  // Métodos para JSON (si no los tenés ya):
+  Map<String, dynamic> toJson() => {
+        'eventName': eventName,
+        'from': from.toIso8601String(),
+        'to': to.toIso8601String(),
+        'background': background.value,
+        'isAllDay': isAllDay,
+        'category': category,
+      };
+
+  factory Meeting.fromJson(Map<String, dynamic> json) => Meeting(
+        json['eventName'],
+        DateTime.parse(json['from']),
+        DateTime.parse(json['to']),
+        Color(json['background']),
+        json['isAllDay'],
+        json['category'],
+      );
 }
 
 // Fuente de datos que enlaza los eventos al calendario

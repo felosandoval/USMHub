@@ -10,8 +10,9 @@ import 'screens/subsystems_page.dart';
 import 'models/university.dart';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:timezone/data/latest.dart' as tz;
 import 'package:permission_handler/permission_handler.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -45,7 +46,12 @@ void main() async {
 
   University? selectedUniversity = await _getSelectedUniversity(); // Obtener la universidad guardada
 
+  // Inicializar zonas horarias
   tz.initializeTimeZones(); // Inicializa las zonas horarias
+  tz.setLocalLocation(tz.getLocation('America/Santiago')); // O la ciudad que corresponda
+
+  final String timeZoneName = DateTime.now().timeZoneName;
+  print('Zona horaria del dispositivo: $timeZoneName');
   const AndroidInitializationSettings initializationSettingsAndroid =
       AndroidInitializationSettings('@mipmap/ic_launcher');
 

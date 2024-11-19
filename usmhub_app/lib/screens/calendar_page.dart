@@ -8,6 +8,8 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../main.dart'; // Ajusta el path según la estructura de tu proyecto
 import 'package:timezone/timezone.dart' as tz;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+
 
 class CalendarPage extends StatefulWidget {
   @override
@@ -18,6 +20,7 @@ class _CalendarPageState extends State<CalendarPage> {
   List<Meeting> meetings = [];
   List<Meeting> filteredMeetings = [];
   Set<String> scheduledEventIds = {};
+  List<Meeting> userCreatedMeetings = [];
 
   final List<String> icsFiles = [
     // https://vra.usm.cl/eventos/mes/2025-01/?ical=1
@@ -36,6 +39,7 @@ class _CalendarPageState extends State<CalendarPage> {
     loadScheduledEventIds().then((_) {
       _loadIcsFiles(); // Carga los eventos después de recuperar los programados
   });
+    loadUserCreatedMeetings();
   }
 
   Future<void> _loadIcsFiles() async {
@@ -89,10 +93,12 @@ class _CalendarPageState extends State<CalendarPage> {
       }
     }
     setState(() {
-      meetings = loadedMeetings;
+      meetings = [...loadedMeetings, ...userCreatedMeetings];
       filteredMeetings = meetings; // Mostrar todos los eventos inicialmente
     });
   }
+
+
   Future<void> scheduleNotification(Meeting meeting) async {
     final notificationId = meeting.hashCode; // ID único basado en el evento
     final eventDate = meeting.from.subtract(Duration(minutes: 15)); // 1 dias antes del evento
@@ -166,6 +172,237 @@ class _CalendarPageState extends State<CalendarPage> {
       }).toList();
     });
   }
+
+
+  Future<void> saveUserCreatedMeetings() async {
+    final prefs = await SharedPreferences.getInstance();
+    final meetingsJson = userCreatedMeetings.map((e) => e.toJson()).toList();
+    await prefs.setString('userCreatedMeetings', jsonEncode(meetingsJson));
+  }
+
+  Future<void> loadUserCreatedMeetings() async {
+    final prefs = await SharedPreferences.getInstance();
+    final meetingsJsonString = prefs.getString('userCreatedMeetings');
+    if (meetingsJsonString != null) {
+      final meetingsJson = jsonDecode(meetingsJsonString) as List;
+      userCreatedMeetings = meetingsJson.map((json) => Meeting.fromJson(json)).toList();
+    }
+  }
+
+
+  Future<void> _showAddEventDialog() async {
+    final titleController = TextEditingController();
+    DateTime? startDate;
+    DateTime? endDate;
+    TimeOfDay? startTime;
+    TimeOfDay? endTime;
+
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Crear Evento'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: titleController,
+              decoration: InputDecoration(labelText: 'Título'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                startDate = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime.now(),
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2100),
+                );
+                if (startDate != null) {
+                  startTime = await showTimePicker(
+                    context: context,
+                    initialTime: TimeOfDay.now(),
+                  );
+                }
+              },
+              child: Text('Fecha y hora de inicio'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                endDate = await showDatePicker(
+                  context: context,
+                  initialDate: startDate ?? DateTime.now(),
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2100),
+                );
+                if (endDate != null) {
+                  endTime = await showTimePicker(
+                    context: context,
+                    initialTime: TimeOfDay.now(),
+                  );
+                }
+              },
+              child: Text('Fecha y hora de fin'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              if (titleController.text.isNotEmpty &&
+                  startDate != null &&
+                  endDate != null &&
+                  startTime != null &&
+                  endTime != null) {
+                // Combinar fecha y hora
+                final startDateTime = DateTime(
+                  startDate!.year,
+                  startDate!.month,
+                  startDate!.day,
+                  startTime!.hour,
+                  startTime!.minute,
+                );
+                final endDateTime = DateTime(
+                  endDate!.year,
+                  endDate!.month,
+                  endDate!.day,
+                  endTime!.hour,
+                  endTime!.minute,
+                );
+
+                // Validación: Verificar que la hora de inicio sea anterior a la de fin
+                if (startDateTime.isAfter(endDateTime) ||
+                    startDateTime.isAtSameMomentAs(endDateTime)) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('La hora de inicio debe ser anterior a la de fin.'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return; // No permitir guardar el evento
+                }
+
+                final newEvent = Meeting(
+                  titleController.text,
+                  startDateTime,
+                  endDateTime,
+                  Colors.blue,
+                  false,
+                  'Creado por el usuario',
+                );
+
+                setState(() {
+                  userCreatedMeetings.add(newEvent);
+                  filteredMeetings.add(newEvent);
+                });
+
+                saveUserCreatedMeetings(); // Guardar en SharedPreferences
+
+                handleEventNotification(event: newEvent);
+                Navigator.of(context).pop();
+              }
+            },
+            child: Text('Guardar'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _deleteUserCreatedEvent(Meeting meeting) async {
+    setState(() {
+      userCreatedMeetings.remove(meeting); // Eliminar de la lista local
+      filteredMeetings.remove(meeting); // Eliminar de la lista visible en el calendario
+    });
+
+    await saveUserCreatedMeetings(); // Guardar cambios en SharedPreferences
+
+    // Cancelar la notificación asociada al evento eliminado
+    handleEventNotification(event: meeting, cancel: true);
+  }
+
+  Future<void> handleEventNotification({
+      required Meeting event,
+      bool cancel = false,
+    }) async {
+      final notificationId = event.hashCode;
+
+      if (cancel) {
+        await flutterLocalNotificationsPlugin.cancel(notificationId);
+        print('Notificación cancelada para el evento: ${event.eventName}');
+        return;
+      }
+      tz.setLocalLocation(tz.getLocation('America/Santiago'));
+      // Calcular el momento de la notificación (2 minutos antes del evento)
+      final scheduledDate = tz.TZDateTime.from(
+        event.from.subtract(Duration(minutes: 2)),
+        tz.local,
+      );
+
+      // Verificar que la fecha esté en el futuro
+      if (scheduledDate.isBefore(tz.TZDateTime.now(tz.local))) {
+        print('El evento ya pasó, no se programará notificación.');
+        return;
+      }
+
+      print('Programando notificación para: $scheduledDate');
+
+      // Programar la notificación
+      await flutterLocalNotificationsPlugin.zonedSchedule(
+        notificationId,
+        event.eventName, // Título
+        'Tu evento "${event.eventName}" comenzará pronto a las ${DateFormat('HH:mm').format(event.from)}.',
+        scheduledDate,
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'event_channel_id', // Asegurate de usar este ID en todos los lugares
+            'Eventos creados', // Nombre del canal
+            channelDescription: 'Notificaciones para eventos creados por el usuario',
+            importance: Importance.max,
+            priority: Priority.high,
+          ),
+        ),
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      );
+
+      print('Notificación programada correctamente.');
+    }
+    
+  //   Future<void> sendScheduledTestNotification() async {
+  // // Inicializar zonas horarias
+  //       tz.setLocalLocation(tz.getLocation('America/Santiago'));
+
+  //       final now = tz.TZDateTime.now(tz.local); // Hora local
+  //       final scheduledDate = now.add(Duration(minutes: 1)); // Programar para 1 minuto después
+
+  //       print('Hora actual: $now');
+  //       print('Programando notificación para: $scheduledDate');
+
+  //       await flutterLocalNotificationsPlugin.zonedSchedule(
+  //         0, // ID único
+  //         'Notificación de prueba',
+  //         'Esta es una notificación programada.',
+  //         scheduledDate,
+  //         const NotificationDetails(
+  //           android: AndroidNotificationDetails(
+  //             'event_channel_id',
+  //             'Eventos creados',
+  //             channelDescription: 'Notificaciones para eventos creados por el usuario',
+  //             importance: Importance.max,
+  //             priority: Priority.high,
+  //           ),
+  //         ),
+  //         uiLocalNotificationDateInterpretation:
+  //             UILocalNotificationDateInterpretation.absoluteTime,
+  //         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle, // Modo exacto
+  //       );
+
+  //       print('Notificación programada correctamente.');
+  //     }
 
   @override
   void dispose() {
@@ -356,6 +593,8 @@ class _CalendarPageState extends State<CalendarPage> {
                 if (details.targetElement == CalendarElement.appointment) {
                   if (details.appointments != null && details.appointments!.isNotEmpty) {
                     final Meeting meeting = details.appointments!.first;
+
+                    // Mostrar el cuadro de diálogo
                     showDialog(
                       context: context,
                       builder: (BuildContext context) {
@@ -365,29 +604,27 @@ class _CalendarPageState extends State<CalendarPage> {
                             mainAxisSize: MainAxisSize.min,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              RichText(
-                                text: TextSpan(
-                                  text: formatDateTime(meeting.from) + ' - ' + formatDateTime(meeting.to),
-                                  style: TextStyle(color: Colors.black),
-                                ),
-                              ),
+                              Text('Desde: ${formatDateTime(meeting.from)}'),
+                              Text('Hasta: ${formatDateTime(meeting.to)}'),
                               SizedBox(height: 8),
-                              Text(
-                                'Categorías:',
-                                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-                              ),
-                              for (var category in meeting.category.split(','))
-                                Text(
-                                  '* ${category.trim()}',
-                                  style: TextStyle(color: Colors.black),
-                                ),
+                              Text('Categorías: ${meeting.category}'),
                             ],
                           ),
                           actions: [
+                            // Mostrar botón "Eliminar" solo si es un evento creado por el usuario
+                            if (userCreatedMeetings.contains(meeting))
+                              TextButton(
+                                onPressed: () {
+                                  _deleteUserCreatedEvent(meeting); // Llamar al método de eliminación
+                                  Navigator.of(context).pop(); // Cerrar el diálogo
+                                },
+                                child: Text(
+                                  'Eliminar',
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                              ),
                             TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
+                              onPressed: () => Navigator.of(context).pop(),
                               child: Text('Cerrar'),
                             ),
                           ],
@@ -397,10 +634,19 @@ class _CalendarPageState extends State<CalendarPage> {
                   }
                 }
               },
+              
             )
+            
           ),
         ],
+        
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showAddEventDialog(),
+        child: Icon(Icons.add),
+        
+),
     );
+    
   }
 }
