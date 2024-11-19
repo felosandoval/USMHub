@@ -62,28 +62,30 @@ class _SubsystemsPageState extends State<SubsystemsPage> {
     });
   }
 
+  String _getPinnedSitesKey(String universityId) {
+    return 'pinnedSites_$universityId';
+  }
+
+
   // Cargar sitios pinneados desde SharedPreferences
   void _loadPinnedSites() {
-    final pinnedSiteIds = prefs?.getStringList('pinnedSites') ?? [];
-    //print('Sitios fijados recuperados: $pinnedSiteIds');
+    final key = _getPinnedSitesKey(widget.university.id.toString());
+    final pinnedSiteIds = prefs?.getStringList(key) ?? [];
+    
     setState(() {
       pinnedSites = allSites.where((site) {
         final siteId = site.id.toString(); // Convertir ID del sitio a String
-        final isPinned = pinnedSiteIds.contains(siteId);
-        //print('Verificando si el sitio $siteId está fijado: $isPinned');
-        return isPinned;
+        return pinnedSiteIds.contains(siteId);
       }).toList();
-      //print('Sitios fijados en memoria: ${pinnedSites.map((site) => site.name).toList()}');
     });
   }
 
+
   // Guardar los sitios pinneados en SharedPreferences
   void _savePinnedSites() {
-    final pinnedSiteIds = pinnedSites.map((site) => site.id.toString()).toList(); // Convertir a String
-    prefs?.setStringList('pinnedSites', pinnedSiteIds);
-
-    // Se Verifica el contenido guardado
-    //print('Sitios fijados guardados: $pinnedSiteIds');
+    final key = _getPinnedSitesKey(widget.university.id.toString());
+    final pinnedSiteIds = pinnedSites.map((site) => site.id.toString()).toList();
+    prefs?.setStringList(key, pinnedSiteIds);
   }
 
   Future<void> _initializeData() async {
@@ -172,7 +174,13 @@ class _SubsystemsPageState extends State<SubsystemsPage> {
           IconButton(
             icon: Icon(Icons.calendar_today),
             onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => CalendarPage()));
+
+              Navigator.push(
+                context, 
+                MaterialPageRoute(
+                  builder: (_) => CalendarPage()
+                )
+              );
             },
           ),
           SizedBox(width: 6),
